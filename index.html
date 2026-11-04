@@ -3,581 +3,618 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STATICS HUB - Moreria Generator</title>
+<title>STATICS HUB — MORERIA</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Share+Tech+Mono&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #070a0f;
-    --surface: #0d121a;
-    --panel: #121a25;
-    --border: rgba(169, 193, 219, 0.16);
-    --border-strong: rgba(169, 193, 219, 0.34);
-    --neon: #8dffd1;
-    --neon-soft: rgba(141, 255, 209, 0.12);
-    --text: #f3f7fb;
-    --muted: #8b9aac;
-    --danger: #ff7c89;
-    --green: #8dffd1;
-    --discord: #7289da;
-    --neon-glow: 0 0 28px rgba(141, 255, 209, 0.22);
+    --bg: #050505;
+    --surface: #0a0a0a;
+    --panel: #101010;
+    --border: #262626;
+    --border-strong: #3a3a3a;
+    --text: #f0f0f0;
+    --muted: #777777;
+    --muted-light: #999999;
+    --accent: #ffffff;
+    --accent-soft: rgba(255,255,255,0.06);
+    --danger: #ff6b7a;
+    --green: #4ade80;
+    --discord: #5865f2;
+    --glow: 0 0 30px rgba(255,255,255,0.06);
   }
   html { background: var(--bg); }
   body {
-    background:
-      radial-gradient(circle at 82% 8%, rgba(34, 77, 99, 0.28), transparent 31rem),
-      radial-gradient(circle at 10% 92%, rgba(38, 28, 76, 0.2), transparent 28rem),
-      var(--bg);
+    background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
   }
+  /* Subtle grid overlay */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(141, 255, 209, 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(141, 255, 209, 0.035) 1px, transparent 1px);
-    background-size: 44px 44px;
+      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 60px 60px;
     pointer-events: none;
     z-index: 0;
-  }
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    background: linear-gradient(115deg, transparent 0 52%, rgba(141,255,209,0.025) 52.1%, transparent 52.4%);
   }
 
-  /* TOP BAR */
+  /* ── TOP BAR ── */
   .top-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
-    height: 72px;
-    background: rgba(7, 10, 15, 0.78);
+    height: 60px;
+    background: rgba(5,5,5,0.92);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 clamp(1rem, 4vw, 3.5rem);
+    padding: 0 1.5rem;
     z-index: 500;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(16px);
   }
-  .top-left { display: flex; align-items: center; gap: clamp(0.8rem, 3vw, 2.4rem); min-width: 0; }
-  .brand-mini {
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(0.78rem, 1.8vw, 1rem);
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    white-space: nowrap;
-  }
-  .brand-mini::before { content: '◈'; color: var(--neon); margin-right: 0.55rem; font-size: 0.75em; }
-  .brand-mini span { color: var(--muted); font-size: 0.58rem; letter-spacing: 0.18em; margin-left: 0.35rem; }
-  .counter-widget {
+  .top-left {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding-left: clamp(0.8rem, 2.5vw, 2rem);
+    gap: 1.8rem;
+    min-width: 0;
+  }
+  .brand {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .brand em {
+    font-style: normal;
+    color: var(--muted);
+    font-weight: 500;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    margin-left: 0.3rem;
+  }
+  .counter {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding-left: 1.8rem;
     border-left: 1px solid var(--border);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
+    font-size: 0.62rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: var(--muted);
   }
-  .counter-widget .counter-num { font-size: 1rem; color: var(--neon); text-shadow: var(--neon-glow); font-weight: bold; }
-  .counter-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--neon);
-    box-shadow: 0 0 12px rgba(141,255,209,0.62);
-    animation: blink 2s infinite;
+  .counter-num {
+    font-size: 0.85rem;
+    color: var(--text);
+    font-weight: 700;
   }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .counter-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
 
   .login-area { display: flex; align-items: center; gap: 0.6rem; }
   .btn-discord {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.4rem 0.9rem;
-    background: var(--discord); border: none; border-radius: 8px;
-    color: white; font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.04em;
+    display: flex; align-items: center; gap: 0.45rem;
+    padding: 0.4rem 0.85rem;
+    background: var(--discord);
+    border: none; border-radius: 6px;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.7rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 8px 22px rgba(114,137,218,0.25);
   }
-  .btn-discord:hover { background: #879bfa; box-shadow: 0 10px 28px rgba(114,137,218,0.4); transform: translateY(-1px); }
-  .btn-discord:disabled { opacity: 0.7; cursor: wait; transform: none; }
-  .btn-discord svg { width: 16px; height: 16px; }
+  .btn-discord:hover { background: #4752c4; transform: translateY(-1px); }
+  .btn-discord:disabled { opacity: 0.6; cursor: wait; transform: none; }
+  .btn-discord svg { width: 14px; height: 14px; }
   .user-chip {
     display: none; align-items: center; gap: 0.5rem;
-    background: rgba(18, 26, 37, 0.92);
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.3rem 0.7rem;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    border-radius: 6px;
+    padding: 0.25rem 0.6rem;
   }
   .user-chip.show { display: flex; }
   .user-avatar {
-    width: 26px; height: 26px; border-radius: 50%;
-    object-fit: cover; border: 1px solid var(--neon);
-    background: var(--surface);
-    box-shadow: 0 0 14px rgba(141,255,209,0.18);
+    width: 24px; height: 24px; border-radius: 50%;
+    object-fit: cover; border: 1px solid var(--border-strong);
   }
-  .user-name { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text); }
-  .user-role-badge {
+  .user-name {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem; padding: 1px 5px; border-radius: 3px;
-    text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;
+    font-size: 0.65rem;
+    color: var(--text);
+  }
+  .role-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem; padding: 1px 5px; border-radius: 3px;
+    text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
   }
   .btn-logout {
-    padding: 0.3rem 0.6rem;
-    background: rgba(255,68,68,0.15);
-    border: 1px solid rgba(255,68,68,0.4);
-    border-radius: 8px; color: var(--danger);
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--muted-light);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem; text-transform: uppercase;
-    cursor: pointer; transition: background 0.2s;
+    font-size: 0.58rem; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
   }
-  .btn-logout:hover { background: rgba(255,68,68,0.28); }
+  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
   .btn-admin {
-    padding: 0.3rem 0.6rem;
-    background: rgba(141,255,209,0.1);
-    border: 1px solid rgba(141,255,209,0.4);
-    border-radius: 8px; color: var(--neon);
+    padding: 0.25rem 0.55rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--muted-light);
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem; text-transform: uppercase;
-    cursor: pointer; transition: background 0.2s;
+    font-size: 0.58rem; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
     display: none;
   }
-  .btn-admin:hover { background: rgba(141,255,209,0.2); }
+  .btn-admin:hover { border-color: var(--text); color: var(--text); }
   .btn-admin.show { display: block; }
 
-  /* MODALS */
+  /* ── MODALS ── */
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(1,4,8,0.78);
+    background: rgba(0,0,0,0.88);
     display: flex; align-items: center; justify-content: center;
     z-index: 2000;
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
   }
   .modal-overlay.hidden { display: none; }
   .modal-box {
-    background: linear-gradient(145deg, #182333, #0e141d);
+    background: var(--panel);
     border: 1px solid var(--border-strong);
-    border-radius: 16px;
-    padding: clamp(1.6rem, 5vw, 2.5rem);
-    max-width: 480px; width: 90%;
+    border-radius: 12px;
+    padding: 2rem;
+    max-width: 420px; width: 90%;
     text-align: center;
-    box-shadow: 0 28px 90px rgba(0,0,0,0.56), 0 0 0 1px rgba(141,255,209,0.04);
-    animation: fadeUp 0.3s ease both;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+    animation: fadeUp 0.25s ease both;
   }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
   .modal-box h2 {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    font-weight: 700; color: var(--text);
-    letter-spacing: -0.04em; margin-bottom: 0.7rem;
+    font-size: 1.3rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.5rem;
   }
   .modal-box p {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem; color: var(--muted);
-    line-height: 1.7; margin-bottom: 1.5rem;
+    font-size: 0.72rem; color: var(--muted);
+    line-height: 1.7; margin-bottom: 1.2rem;
   }
-  .auth-eyebrow {
-    margin-bottom: 0.8rem; color: var(--neon);
+  .eyebrow {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase;
+    font-size: 0.58rem; color: var(--muted);
+    letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 0.7rem;
   }
   .auth-status {
-    display: flex; align-items: center; gap: 0.55rem;
-    min-height: 2.5rem; margin: 1.25rem 0 1rem;
-    padding: 0.7rem 0.8rem;
-    color: var(--neon);
-    background: rgba(141,255,209,0.06);
-    border: 1px solid rgba(141,255,209,0.2);
-    border-radius: 8px;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem; letter-spacing: 0.12em;
+    font-size: 0.6rem; letter-spacing: 0.1em;
+    padding: 0.6rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
   }
-  .auth-status::before {
-    content: ''; width: 7px; height: 7px;
-    flex: 0 0 auto; border-radius: 50%;
-    background: currentColor; box-shadow: 0 0 12px currentColor;
+  .auth-status[data-state="error"] { color: var(--danger); border-color: rgba(255,107,122,0.25); }
+  .auth-status[data-state="loading"] { color: var(--muted-light); }
+  .auth-note { font-size: 0.62rem; margin-top: 0.8rem; }
+
+  /* ── ADMIN ── */
+  .admin-box {
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    width: 92%; max-width: 620px;
+    max-height: 82vh;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+    animation: fadeUp 0.25s ease both;
   }
-  .auth-status[data-state="error"] { color: var(--danger); background: rgba(255,124,137,0.07); border-color: rgba(255,124,137,0.25); }
-  .auth-status[data-state="loading"] { color: #b7c7ff; background: rgba(114,137,218,0.08); border-color: rgba(114,137,218,0.25); }
-  .modal-btns { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
-  .auth-note { margin-top: 1rem; font-size: 0.68rem; }
-  .auth-recovery {
+  .admin-head {
     display: flex; align-items: center; justify-content: space-between;
-    gap: 0.8rem; margin-top: 1.25rem; padding-top: 1rem;
-    border-top: 1px solid var(--border);
-    color: var(--muted); font-size: 0.7rem;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--border);
   }
-  .auth-recovery button {
-    padding: 0; color: var(--neon); background: none; border: 0;
-    font: inherit; font-weight: 700; cursor: pointer;
+  .admin-head h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   }
-  .auth-recovery button:hover { color: var(--text); }
+  .admin-close {
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: 1px solid var(--border);
+    border-radius: 4px; color: var(--muted);
+    cursor: pointer; font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .admin-close:hover { border-color: var(--text); color: var(--text); }
+  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .admin-tab {
+    flex: 1; padding: 0.65rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.68rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--muted); background: none; border: none;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .admin-tab.active { color: var(--text); border-bottom: 2px solid var(--text); }
+  .admin-body { flex: 1; overflow-y: auto; padding: 1rem; }
+  .pane { display: none; }
+  .pane.active { display: block; }
 
-  /* MAIN */
-  .main-container {
-    max-width: 1120px;
+  /* ── MAIN ── */
+  .container {
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 150px 2rem 4rem;
-    position: relative;
-    z-index: 1;
+    padding: 130px 1.5rem 4rem;
+    position: relative; z-index: 1;
   }
-  .home-screen::before {
-    content: 'STATIC CONSOLE / MORERIA GENERATOR';
-    display: block; color: var(--neon); opacity: 0.82;
+  .page-eyebrow {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.67rem; letter-spacing: 0.24em;
-    margin-bottom: 1.2rem;
+    font-size: 0.58rem; color: var(--muted);
+    letter-spacing: 0.22em; text-transform: uppercase;
+    margin-bottom: 1rem;
   }
-  .home-title {
+  .page-title {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(3.4rem, 10vw, 8.5rem);
-    font-weight: 700; line-height: 0.84;
-    letter-spacing: -0.09em; color: var(--text);
-    text-shadow: 0 12px 45px rgba(0,0,0,0.36);
-    margin-bottom: 0;
+    font-size: clamp(3rem, 9vw, 7rem);
+    font-weight: 700;
+    line-height: 0.86;
+    letter-spacing: -0.06em;
+    color: var(--text);
+    margin-bottom: 0.2rem;
   }
-  .home-subtitle {
+  .page-title-sub {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.5rem, 6.5vw, 5.7rem);
-    font-weight: 700; line-height: 0.92;
-    letter-spacing: -0.08em;
-    color: transparent;
-    background: linear-gradient(100deg, var(--neon), #b7c7ff 70%, #71819a);
-    -webkit-background-clip: text; background-clip: text;
-    margin-bottom: 1.3rem;
+    font-size: clamp(2rem, 6vw, 4.5rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
   }
-  .home-subtitle-sub {
-    max-width: 680px;
+  .page-desc {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem; color: var(--muted);
-    letter-spacing: 0.2em; line-height: 1.8;
-    margin-bottom: 3.1rem;
+    font-size: 0.65rem; color: var(--muted);
+    letter-spacing: 0.12em; line-height: 1.8;
+    margin-bottom: 3rem;
   }
 
-  /* TOOL PANELS */
-  .tool-wrapper { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 2rem; position: relative; z-index: 1; }
-  .tool-header { text-align: left; margin-bottom: 2.8rem; animation: fadeDown 0.55s ease both; }
-  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
+  /* ── TOOL SECTIONS ── */
+  .tool-header { margin-bottom: 2rem; }
   .tool-header h1 {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.1rem, 5vw, 3.7rem);
-    font-weight: 700; letter-spacing: -0.055em;
-    text-transform: uppercase; color: var(--text);
-    line-height: 1;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 700; letter-spacing: -0.04em;
+    text-transform: uppercase;
   }
   .tool-header .tagline {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem; letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--neon);
-    opacity: 0.78; margin-top: 0.4rem;
+    font-size: 0.62rem; color: var(--muted);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-top: 0.2rem;
   }
+
   .panel {
-    background: linear-gradient(145deg, rgba(20,30,43,0.96), rgba(12,17,25,0.96));
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
     overflow: hidden;
-    margin-bottom: 1.2rem;
-    animation: fadeUp 0.5s ease both;
-    box-shadow: 0 20px 55px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.035);
+    animation: fadeUp 0.4s ease both;
   }
-  .panel:nth-child(1) { animation-delay: 0.05s; }
-  .panel:nth-child(2) { animation-delay: 0.13s; }
-  .panel:nth-child(3) { animation-delay: 0.21s; }
-  .ph {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 0.75rem 1.4rem;
-    background: rgba(24,35,51,0.72);
+  .panel:nth-child(1) { animation-delay: 0.04s; }
+  .panel:nth-child(2) { animation-delay: 0.1s; }
+  .panel:nth-child(3) { animation-delay: 0.16s; }
+
+  .panel-head {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.65rem 1.2rem;
+    background: var(--surface);
     border-bottom: 1px solid var(--border);
   }
-  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: blink 2.2s infinite; background: var(--neon); box-shadow: 0 0 12px rgba(141,255,209,0.62); }
-  .ph-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem; text-transform: uppercase;
-    letter-spacing: 0.15em; color: var(--neon);
+  .dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--muted); flex-shrink: 0;
   }
-  .pb { padding: 1.4rem; }
+  .dot.active { background: var(--green); }
+  .panel-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem; text-transform: uppercase;
+    letter-spacing: 0.12em; color: var(--muted-light);
+  }
+  .panel-body { padding: 1.2rem; }
+
   .lbl {
     display: block;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem; text-transform: uppercase;
-    letter-spacing: 0.13em; color: var(--muted);
-    margin-bottom: 0.45rem;
+    font-size: 0.58rem; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--muted);
+    margin-bottom: 0.35rem;
   }
-  .search-row { display: flex; gap: 0.6rem; margin-bottom: 0.75rem; }
-  .search-input, .txt {
-    flex: 1; width: 100%;
-    background: rgba(6,10,15,0.7);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 0.55rem 0.85rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .search-input:focus, .txt:focus {
-    border-color: var(--neon);
-    box-shadow: 0 0 0 3px rgba(141,255,209,0.1), 0 0 24px rgba(141,255,209,0.1);
-  }
-  .search-input::placeholder, .txt::placeholder { color: var(--muted); }
-  .btn-sm {
-    padding: 0.5rem 0.9rem;
-    background: rgba(141,255,209,0.06);
-    border: 1px solid rgba(141,255,209,0.35);
-    border-radius: 8px; color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem; text-transform: uppercase;
-    letter-spacing: 0.08em; cursor: pointer;
-    white-space: nowrap; transition: background 0.2s;
-  }
-  .btn-sm:hover { background: rgba(141,255,209,0.14); }
-  .btn-sm.red { color: var(--danger); border-color: rgba(255,124,137,0.5); background: rgba(255,124,137,0.06); }
-  .btn-sm.red:hover { background: rgba(255,124,137,0.14); }
-  .animal-list {
-    background: rgba(5,9,14,0.72);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    height: 240px; overflow-y: auto;
-    scrollbar-width: thin; scrollbar-color: var(--neon) transparent;
-  }
-  .animal-list::-webkit-scrollbar { width: 4px; }
-  .animal-list::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 4px; }
-  .a-item {
-    display: flex; align-items: center; gap: 0.65rem;
-    padding: 0.48rem 0.9rem; cursor: pointer;
-    border-bottom: 1px solid rgba(141,255,209,0.04);
-    transition: background 0.12s; user-select: none;
-  }
-  .a-item:last-child { border-bottom: none; }
-  .a-item:hover { background: rgba(141,255,209,0.06); }
-  .a-item.on { background: rgba(141,255,209,0.11); }
-  .a-item input[type="checkbox"] {
-    -webkit-appearance: none; appearance: none;
-    width: 13px; height: 13px;
-    border: 1px solid rgba(141,255,209,0.66);
-    border-radius: 3px;
-    background: rgba(5,9,14,0.72); cursor: pointer;
-    flex-shrink: 0; position: relative; outline: none;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .a-item input[type="checkbox"]:checked { background: var(--neon); border-color: var(--neon); box-shadow: var(--neon-glow); }
-  .a-item input[type="checkbox"]:checked::after {
-    content: '\2713'; position: absolute; color: black;
-    font-size: 8px; font-weight: bold;
-    top: 50%; left: 50%; transform: translate(-50%,-55%);
-  }
-  .a-name { font-size: 0.88rem; line-height: 1.2; flex: 1; color: var(--text); }
-  .badge-og {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 9px; font-weight: bold; text-transform: uppercase;
-    letter-spacing: 1px; padding: 2px 6px; border-radius: 4px;
-    background: var(--neon-soft); color: var(--neon);
-    border: 1px solid rgba(141,255,209,0.5); margin-left: 8px;
-  }
-  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
-  .sel-count { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-  .sel-count span { color: var(--neon); }
-  .hint { font-family: 'Share Tech Mono', monospace; font-size: 0.67rem; color: var(--muted); margin-top: 0.4rem; }
-  .hint.error { color: var(--danger) !important; font-weight: bold; }
-  .btn-gen {
-    display: block; width: 100%; padding: 0.92rem;
-    background: linear-gradient(100deg, var(--neon), #b8ffe7);
-    border: none; border-radius: 10px;
-    color: #07110f;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s;
-    box-shadow: 0 12px 28px rgba(141,255,209,0.18);
-    margin-bottom: 1.2rem;
-  }
-  .btn-gen:hover { background: linear-gradient(100deg, #b8ffe7, var(--neon)); box-shadow: 0 16px 36px rgba(141,255,209,0.3); transform: translateY(-2px); }
-  .btn-gen:disabled { opacity: 0.6; cursor: wait; transform: none; }
-  .out-ph {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 0.75rem 1.4rem;
-    background: rgba(24,35,51,0.72);
-    border-bottom: 1px solid var(--border);
-  }
-  .out-ph-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem; text-transform: uppercase;
-    letter-spacing: 0.15em; color: var(--neon);
-  }
-  .btn-copy {
-    margin-left: auto; padding: 0.26rem 0.7rem;
-    background: rgba(141,255,209,0.06);
-    border: 1px solid rgba(141,255,209,0.35);
-    border-radius: 8px; color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem; text-transform: uppercase;
-    letter-spacing: 0.1em; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-copy:hover { background: rgba(141,255,209,0.14); }
-  .btn-copy.ok { color: var(--green); border-color: var(--green); background: rgba(141,255,209,0.1); }
-  .code-block {
-    background: rgba(5,9,14,0.72);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.79rem; line-height: 1.8;
-    color: #c9ffe9; min-height: 120px;
-    max-height: 480px; overflow-y: auto;
-    white-space: pre; overflow-x: auto;
-    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-  }
-  .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
-  .toast {
-    position: fixed; bottom: 1.5rem; left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.75rem 1.4rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem; color: var(--text);
-    z-index: 999; transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0; white-space: nowrap;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--danger); color: var(--danger); }
-
-  /* ADMIN PANEL */
-  .admin-modal-box {
-    background: linear-gradient(145deg, #182333, #0e141d);
-    border: 1px solid var(--border-strong);
-    border-radius: 16px;
-    width: 92%; max-width: 680px;
-    max-height: 85vh; overflow: hidden;
-    display: flex; flex-direction: column;
-    box-shadow: 0 28px 90px rgba(0,0,0,0.56);
-    animation: fadeUp 0.3s ease both;
-  }
-  .admin-header {
-    padding: 1rem 1.4rem;
-    background: rgba(24,35,51,0.84);
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .admin-header h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.1rem; font-weight: 700;
-    color: var(--text); letter-spacing: 0.1em; text-transform: uppercase;
-  }
-  .admin-close {
-    width: 28px; height: 28px;
+  .input {
+    width: 100%;
+    background: var(--bg);
     border: 1px solid var(--border);
     border-radius: 6px;
-    background: #1c1c1c; color: var(--neon);
-    font-size: 1rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s;
-  }
-  .admin-close:hover { background: #2c2c2c; }
-  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); }
-  .admin-tab {
-    flex: 1; padding: 0.7rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.72rem; text-transform: uppercase;
-    letter-spacing: 0.08em; text-align: center;
-    cursor: pointer; color: var(--muted);
-    transition: color 0.2s, background 0.2s;
-    border: none; background: none;
-  }
-  .admin-tab.active {
+    padding: 0.55rem 0.8rem;
     color: var(--text);
-    background: #202020;
-    border-bottom: 2px solid var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem;
+    outline: none;
+    transition: border-color 0.2s;
   }
-  .admin-body { flex: 1; overflow-y: auto; padding: 1.2rem; }
-  .admin-tab-pane { display: none; }
-  .admin-tab-pane.active { display: block; }
+  .input:focus { border-color: var(--border-strong); }
+  .input::placeholder { color: var(--muted); }
+  .hint {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem; color: var(--muted);
+    margin-top: 0.3rem;
+  }
+  .hint.error { color: var(--danger); }
 
-  @media (max-width: 600px) {
-    .top-bar { padding: 0 0.8rem; }
-    .top-left { gap: 0.8rem; }
-    .brand-mini { font-size: 0.74rem; }
-    .brand-mini span { display: none; }
-    .counter-widget { padding-left: 0.8rem; font-size: 0.58rem; }
-    .counter-widget span:not(.counter-num) { display: none; }
-    .main-container { padding: 120px 1rem 3rem; }
-    .home-title { font-size: clamp(3.1rem, 18vw, 5.5rem); }
-    .home-subtitle { font-size: clamp(2rem, 12vw, 4rem); }
+  .search-row { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
+  .search-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    outline: none;
   }
+  .search-input:focus { border-color: var(--border-strong); }
+  .btn-sm {
+    padding: 0.45rem 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--muted-light);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-sm:hover { border-color: var(--text); color: var(--text); }
+  .btn-sm.danger { color: var(--danger); border-color: rgba(255,107,122,0.3); }
+  .btn-sm.danger:hover { border-color: var(--danger); }
+
+  .animal-list {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+  .animal-list::-webkit-scrollbar { width: 3px; }
+  .animal-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .a-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.4rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.02);
+    cursor: pointer; transition: background 0.1s;
+    user-select: none;
+  }
+  .a-item:last-child { border-bottom: none; }
+  .a-item:hover { background: rgba(255,255,255,0.025); }
+  .a-item.on { background: rgba(255,255,255,0.045); }
+  .a-item input[type="checkbox"] {
+    -webkit-appearance: none; appearance: none;
+    width: 12px; height: 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    background: transparent; cursor: pointer;
+    flex-shrink: 0; position: relative;
+    transition: all 0.15s;
+  }
+  .a-item input[type="checkbox"]:checked {
+    background: var(--text); border-color: var(--text);
+  }
+  .a-item input[type="checkbox"]:checked::after {
+    content: '✓'; position: absolute;
+    color: var(--bg); font-size: 8px; font-weight: 900;
+    top: 50%; left: 50%; transform: translate(-50%,-55%);
+  }
+  .a-name { font-size: 0.8rem; flex: 1; color: var(--text); }
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.5rem; text-transform: uppercase;
+    letter-spacing: 0.06em; padding: 1px 5px;
+    border-radius: 3px; border: 1px solid var(--border-strong);
+    color: var(--muted);
+  }
+  .a-mps {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem; color: var(--muted);
+    min-width: 70px; text-align: right;
+  }
+  .meta-row { display: flex; justify-content: space-between; margin-top: 0.5rem; }
+  .sel-count {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem; color: var(--muted);
+  }
+  .sel-count span { color: var(--text); }
+
+  .btn-gen {
+    display: block; width: 100%;
+    padding: 0.85rem;
+    background: var(--text);
+    border: none; border-radius: 8px;
+    color: var(--bg);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    margin-bottom: 1rem;
+  }
+  .btn-gen:hover { background: #d0d0d0; transform: translateY(-1px); }
+  .btn-gen:disabled { opacity: 0.4; cursor: wait; transform: none; }
+
+  .out-head {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.65rem 1.2rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .btn-copy {
+    margin-left: auto;
+    padding: 0.25rem 0.6rem;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--muted-light);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.58rem; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-copy:hover { border-color: var(--text); color: var(--text); }
+  .btn-copy.ok { border-color: var(--green); color: var(--green); }
+  .code-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.9rem 1rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem; line-height: 1.7;
+    color: var(--muted-light);
+    min-height: 100px; max-height: 400px;
+    overflow: auto; white-space: pre; overflow-x: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent;
+  }
+  .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%;
+    transform: translateX(-50%) translateY(60px);
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 0.65rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem; color: var(--text);
+    z-index: 999; opacity: 0;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(74,222,128,0.4); color: var(--green); }
+  .toast.error { border-color: rgba(255,107,122,0.4); color: var(--danger); }
+
+  /* ── SUGGESTIONS ── */
+  .suggestions {
+    position: absolute; bottom: 100%; left: 0; right: 0;
+    background: var(--panel);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    max-height: 180px; overflow-y: auto;
+    z-index: 100;
+  }
+  .sug-item {
+    padding: 8px 10px; cursor: pointer;
+    display: flex; align-items: center; gap: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: background 0.1s;
+  }
+  .sug-item:hover { background: rgba(255,255,255,0.04); }
+  .sug-avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    overflow: hidden; background: var(--surface);
+  }
+  .sug-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .sug-name { font-size: 0.78rem; font-weight: 600; }
+  .sug-handle { font-size: 0.65rem; color: var(--muted); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 640px) {
+    .top-bar { padding: 0 0.8rem; }
+    .brand em { display: none; }
+    .counter { padding-left: 0.8rem; }
+    .counter span:not(.counter-num) { display: none; }
+    .container { padding: 100px 1rem 3rem; }
+    .page-title { font-size: clamp(2.6rem, 16vw, 4.5rem); }
+    .page-title-sub { font-size: clamp(1.8rem, 10vw, 3rem); }
+    .user-name { display: none; }
+  }
+
+  /* ── UTILITY ── */
+  .mt-2 { margin-top: 0.6rem; }
+  .gap-row { display: flex; gap: 0.5rem; }
+  .flex-1 { flex: 1; }
+  textarea.input { resize: vertical; min-height: 70px; }
 </style>
 </head>
 <body>
 
-<!-- TOP BAR -->
+<!-- ── TOP BAR ── -->
 <div class="top-bar">
   <div class="top-left">
-    <div class="brand-mini">STATICS HUB <span>/ MORERIA</span></div>
-    <div class="counter-widget">
+    <div class="brand">STATICS <em>/ MORERIA</em></div>
+    <div class="counter">
       <div class="counter-dot"></div>
-      <span>Scripts Generated:</span>
+      <span>Generated:</span>
       <span class="counter-num" id="counterNum">0</span>
     </div>
   </div>
   <div class="login-area">
-    <button class="btn-discord" id="loginBtn" type="button" aria-busy="false" onclick="loginWithDiscord()">
+    <button class="btn-discord" id="loginBtn" onclick="loginWithDiscord()">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-      <span class="auth-button-label">Sign in with Discord</span>
+      <span>Sign in</span>
     </button>
     <div class="user-chip" id="userChip">
       <img class="user-avatar" id="userAvatar" src="" alt="">
       <span class="user-name" id="userNameDisplay"></span>
-      <span class="user-role-badge" id="topRoleBadge" style="display:none"></span>
-      <button class="btn-admin" id="adminOpenBtn" onclick="openAdmin()">⚙ Admin</button>
-      <button class="btn-logout" onclick="logout()">Logout</button>
+      <span class="role-badge" id="topRoleBadge" style="display:none"></span>
+      <button class="btn-admin" id="adminOpenBtn" onclick="openAdmin()">Admin</button>
+      <button class="btn-logout" onclick="logout()">Exit</button>
     </div>
   </div>
 </div>
 
-<!-- LOGIN MODAL -->
-<div class="modal-overlay hidden" id="loginModal" role="dialog" aria-modal="true">
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay hidden" id="loginModal">
   <div class="modal-box">
-    <div class="auth-eyebrow">AUTH / 01</div>
-    <h2>Connect your Discord</h2>
-    <p>Sign in once to unlock script generation and keep your activity tied to your Discord identity.</p>
-    <div class="auth-status" id="loginStatus" aria-live="polite">READY TO CONNECT</div>
-    <div class="modal-btns">
-      <button class="btn-discord" id="loginModalBtn" type="button" aria-busy="false" onclick="loginWithDiscord()">
-        <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-        <span class="auth-button-label">Sign in with Discord</span>
-      </button>
-    </div>
-    <p class="auth-note">Identity permission only. Webhook values stay in this browser.</p>
-    <div class="auth-recovery">
-      <span>Having trouble?</span>
-      <button type="button" onclick="loginWithDiscord()">Try again</button>
-    </div>
+    <div class="eyebrow">Authentication</div>
+    <h2>Connect Discord</h2>
+    <p>Sign in to generate scripts and track your activity.</p>
+    <div class="auth-status" id="loginStatus" data-state="idle">READY</div>
+    <button class="btn-discord" id="loginModalBtn" onclick="loginWithDiscord()" style="margin:0 auto;">
+      <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      <span>Sign in with Discord</span>
+    </button>
+    <p class="auth-note">Identity only. Webhooks stay local.</p>
   </div>
 </div>
 
-<!-- ADMIN PANEL -->
+<!-- ── ADMIN MODAL ── -->
 <div class="modal-overlay hidden" id="adminModal">
-  <div class="admin-modal-box">
-    <div class="admin-header">
-      <h2>⚙ Admin Panel</h2>
+  <div class="admin-box">
+    <div class="admin-head">
+      <h2>Admin</h2>
       <button class="admin-close" onclick="closeModal('adminModal')">✕</button>
     </div>
     <div class="admin-tabs">
@@ -585,98 +622,94 @@
       <button class="admin-tab" onclick="switchAdminTab('users', this)">Users</button>
     </div>
     <div class="admin-body">
-      <div class="admin-tab-pane active" id="adminTab-roles">
-        <p class="admin-section-title" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Create a new role</p>
-        <div style="display:flex;gap:0.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
-          <input id="newRoleName" type="text" placeholder="Role name (e.g. VIP, Moderator)" style="flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:0.5rem 0.8rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;">
-          <input id="newRoleColor" type="color" value="#8dffd1" title="Pick a color" style="width:40px;height:36px;border:1px solid var(--border);border-radius:7px;background:var(--surface);cursor:pointer;padding:2px;">
-          <button onclick="addRole()" style="padding:0.5rem 0.9rem;background:rgba(141,255,209,0.06);border:1px solid rgba(141,255,209,0.35);border-radius:7px;color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;cursor:pointer;white-space:nowrap;">+ Add Role</button>
+      <div class="pane active" id="pane-roles">
+        <label class="lbl">New role</label>
+        <div class="gap-row" style="margin-bottom:0.8rem;">
+          <input class="input flex-1" id="newRoleName" placeholder="Name">
+          <input type="color" id="newRoleColor" value="#ffffff" style="width:36px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;padding:2px;">
+          <button class="btn-sm" onclick="addRole()">Add</button>
         </div>
-        <p style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Existing roles</p>
         <div id="rolesList"></div>
       </div>
-      <div class="admin-tab-pane" id="adminTab-users">
-        <p style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Users who have signed in</p>
+      <div class="pane" id="pane-users">
         <div id="usersList"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
-<div class="main-container home-screen" id="homeScreen">
-  <h1 class="home-title">STATICS HUB</h1>
-  <h1 class="home-subtitle">MORERIA GENERATOR</h1>
-  <p class="home-subtitle-sub">GENERATE MORERIA SCRIPTS WITH CUSTOM LOGGERS</p>
+<!-- ── MAIN CONTENT ── -->
+<div class="container" id="mainContent">
+  <div class="page-eyebrow">01 / Moreria Generator</div>
+  <h1 class="page-title">MORERIA</h1>
+  <div class="page-title-sub">LOGGER</div>
+  <p class="page-desc">SELECT TARGETS · CONFIGURE WEBHOOK · GENERATE</p>
 
-  <div class="tool-wrapper">
-    <header class="tool-header">
-      <h1>Moreria Logger</h1>
-      <p class="tagline">Powered by Statics Hub</p>
-    </header>
+  <div class="tool-header">
+    <h1>Script Builder</h1>
+    <p class="tagline">Statics Hub × Moreria</p>
+  </div>
 
-    <!-- ANIMAL SELECTION PANEL -->
-    <div class="panel">
-      <div class="ph"><div class="dot"></div><span class="ph-title">Select Brainrot Animals</span></div>
-      <div class="pb">
-        <div class="search-row">
-          <input class="search-input" id="searchBox" type="text" placeholder="Search animals..." oninput="filterList()">
-          <button class="btn-sm" onclick="selectAll()">All</button>
-          <button class="btn-sm red" onclick="clearAll()">Clear</button>
-        </div>
-        <div class="animal-list" id="animalList"></div>
-        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
-          <input type="text" id="customBrainrotName" placeholder="Add custom brainrot name..." style="flex:1;background:rgba(6,10,15,0.7);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.85rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;">
-          <button class="btn-sm" onclick="addCustomBrainrot()">Add</button>
-        </div>
-        <div style="margin-top:1rem;">
-          <textarea id="pasteCustomListTextarea" placeholder='Paste your custom list here, e.g.:
+  <!-- ANIMALS -->
+  <div class="panel">
+    <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Animals</span></div>
+    <div class="panel-body">
+      <div class="search-row">
+        <input class="search-input" id="searchBox" placeholder="Filter..." oninput="filterList()">
+        <button class="btn-sm" onclick="selectAll()">All</button>
+        <button class="btn-sm danger" onclick="clearAll()">Clear</button>
+      </div>
+      <div class="animal-list" id="animalList"></div>
+      <div class="gap-row mt-2">
+        <input class="input flex-1" id="customBrainrotName" placeholder="Custom name...">
+        <button class="btn-sm" onclick="addCustomBrainrot()">Add</button>
+      </div>
+      <div class="mt-2">
+        <textarea class="input" id="pasteCustomListTextarea" placeholder='Paste list:
 ["Meowl"] = true,
-["Skibidi Toilet"] = true,' style="width:100%;background:rgba(6,10,15,0.7);border:1px solid var(--border);border-radius:8px;padding:0.72rem 1rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.88rem;min-height:100px;resize:vertical;outline:none;"></textarea>
-          <button class="btn-sm" style="margin-top:0.5rem;" onclick="parsePastedList()">Paste Custom List</button>
-        </div>
-        <div class="meta-row">
-          <span class="sel-count"><span id="selNum">0</span> selected</span>
-        </div>
+["Skibidi Toilet"] = true,'></textarea>
+        <button class="btn-sm mt-2" onclick="parsePastedList()">Parse List</button>
+      </div>
+      <div class="meta-row">
+        <span class="sel-count"><span id="selNum">0</span> selected</span>
       </div>
     </div>
+  </div>
 
-    <!-- USERNAME PANEL -->
-    <div class="panel">
-      <div class="ph"><div class="dot"></div><span class="ph-title">Roblox Username</span></div>
-      <div class="pb">
-        <label class="lbl">Target username</label>
-        <div style="position:relative;">
-          <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
-          <div id="usernameSuggestions"></div>
-        </div>
-        <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
+  <!-- USERNAME -->
+  <div class="panel">
+    <div class="panel-head"><div class="dot"></div><span class="panel-title">Target Username</span></div>
+    <div class="panel-body">
+      <label class="lbl">Roblox username</label>
+      <div style="position:relative;">
+        <input class="input" id="usernameInput" placeholder="Builderman" autocomplete="off" spellcheck="false">
+        <div id="usernameSuggestions"></div>
       </div>
+      <p class="hint" id="usernameHint">Minimum 3 characters.</p>
     </div>
+  </div>
 
-    <!-- WEBHOOK PANEL -->
-    <div class="panel">
-      <div class="ph"><div class="dot"></div><span class="ph-title">Discord Webhook</span></div>
-      <div class="pb">
-        <label class="lbl">Webhook URL</label>
-        <input class="txt" id="webhookInput" type="text" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" oninput="validateWebhook()">
-        <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
-      </div>
+  <!-- WEBHOOK -->
+  <div class="panel">
+    <div class="panel-head"><div class="dot"></div><span class="panel-title">Discord Webhook</span></div>
+    <div class="panel-body">
+      <label class="lbl">Webhook URL</label>
+      <input class="input" id="webhookInput" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" oninput="validateWebhook()">
+      <p class="hint" id="webhookHint">Must start with https://discord.com/api/webhooks/</p>
     </div>
+  </div>
 
-    <!-- GENERATE BUTTON -->
-    <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
+  <button class="btn-gen" id="genBtn" onclick="generate()">⚡ Generate Script</button>
 
-    <!-- OUTPUT PANEL -->
-    <div class="panel">
-      <div class="out-ph">
-        <div class="dot"></div>
-        <span class="out-ph-title">Generated Script</span>
-        <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
-      </div>
-      <div class="pb">
-        <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit Generate Script...</div>
-      </div>
+  <!-- OUTPUT -->
+  <div class="panel">
+    <div class="out-head">
+      <div class="dot"></div>
+      <span class="panel-title">Output</span>
+      <button class="btn-copy" id="copyBtn" onclick="copyOut()">Copy</button>
+    </div>
+    <div class="panel-body">
+      <div class="code-block empty" id="outputBlock">Fill fields above and click Generate...</div>
     </div>
   </div>
 </div>
@@ -684,227 +717,186 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  CONFIG
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── CONFIG ──
 const DISCORD_CLIENT_ID = '1368253122299822292';
 const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
 const DISCORD_AUTH_TIMEOUT_MS = 12000;
 
 const ADMIN_MAP = {
-  'bythbzen':    { title: 'Founder', color: '#8dffd1' },
-  'visualcoder': { title: 'Owner',   color: '#8dffd1' },
-  'levraimlk':   { title: 'Developer', color: '#8dffd1' }
+  'bythbzen':    { title: 'Founder', color: '#ffffff' },
+  'visualcoder': { title: 'Owner',   color: '#ffffff' },
+  'levraimlk':   { title: 'Developer', color: '#ffffff' }
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  STATE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── STATE ──
 let selected = new Set();
 let currentUser = null;
 let authRequestActive = false;
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  SCRIPTS COUNTER
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getScriptCount() { return parseInt(localStorage.getItem('statics_moreria_count') || '0'); }
-function incrementScriptCount() {
-  const n = getScriptCount() + 1;
+// ── COUNTER ──
+function getCount() { return parseInt(localStorage.getItem('statics_moreria_count') || '0'); }
+function incrementCount() {
+  const n = getCount() + 1;
   localStorage.setItem('statics_moreria_count', n);
   document.getElementById('counterNum').textContent = n;
 }
-function initCounter() { document.getElementById('counterNum').textContent = getScriptCount(); }
+function initCounter() { document.getElementById('counterNum').textContent = getCount(); }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  DISCORD OAUTH2
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function setAuthState(state, message) {
-  const status = document.getElementById('loginStatus');
-  if (status) { status.dataset.state = state; status.textContent = message; }
+// ── DISCORD AUTH ──
+function setAuthState(state, msg) {
+  const el = document.getElementById('loginStatus');
+  if (el) { el.dataset.state = state; el.textContent = msg; }
 }
-
-function setAuthButtonLoading(isLoading) {
+function setAuthLoading(v) {
   ['loginBtn', 'loginModalBtn'].forEach(id => {
-    const button = document.getElementById(id);
-    if (!button) return;
-    button.disabled = isLoading;
-    button.setAttribute('aria-busy', String(isLoading));
-    const label = button.querySelector('.auth-button-label');
-    if (label) label.textContent = isLoading ? 'Opening Discord...' : 'Sign in with Discord';
+    const b = document.getElementById(id);
+    if (!b) return;
+    b.disabled = v;
+    const span = b.querySelector('span');
+    if (span) span.textContent = v ? 'Opening...' : 'Sign in';
   });
 }
-
-function clearStoredDiscordUser() {
+function clearStoredUser() {
   localStorage.removeItem('statics_moreria_discord_user');
   currentUser = null;
 }
-
 function loginWithDiscord() {
   if (authRequestActive) return;
   authRequestActive = true;
   setAuthState('loading', 'OPENING DISCORD');
-  setAuthButtonLoading(true);
-  sessionStorage.setItem('statics_moreria_auth_pending', '1');
-  const params = new URLSearchParams({
+  setAuthLoading(true);
+  sessionStorage.setItem('statics_moreria_pending', '1');
+  const p = new URLSearchParams({
     client_id: DISCORD_CLIENT_ID,
     redirect_uri: DISCORD_REDIRECT_URI,
     response_type: 'token',
     scope: 'identify'
   });
-  window.location.href = `https://discord.com/oauth2/authorize?${params}`;
+  window.location.href = `https://discord.com/oauth2/authorize?${p}`;
 }
-
-async function handleDiscordCallback() {
+async function handleCallback() {
   const hash = window.location.hash.substring(1);
   if (!hash) return;
-  const params = new URLSearchParams(hash);
-  const oauthError = params.get('error');
-  if (oauthError) {
-    history.replaceState(null, '', window.location.pathname + window.location.search);
-    sessionStorage.removeItem('statics_moreria_auth_pending');
+  const p = new URLSearchParams(hash);
+  if (p.get('error')) {
+    history.replaceState(null, '', location.pathname + location.search);
+    sessionStorage.removeItem('statics_moreria_pending');
     authRequestActive = false;
-    setAuthButtonLoading(false);
-    setAuthState('error', 'DISCORD LOGIN CANCELLED');
+    setAuthLoading(false);
+    setAuthState('error', 'CANCELLED');
     showLoginGate();
     return;
   }
-  const token = params.get('access_token');
+  const token = p.get('access_token');
   if (!token) return;
-
-  history.replaceState(null, '', window.location.pathname + window.location.search);
-  sessionStorage.removeItem('statics_moreria_auth_pending');
-  setAuthState('loading', 'RETURNING FROM DISCORD');
-
-  let timeoutId;
+  history.replaceState(null, '', location.pathname + location.search);
+  sessionStorage.removeItem('statics_moreria_pending');
+  setAuthState('loading', 'VERIFYING');
+  let tid;
   try {
-    const controller = new AbortController();
-    timeoutId = setTimeout(() => controller.abort(), DISCORD_AUTH_TIMEOUT_MS);
-    const userRes = await fetch('https://discord.com/api/users/@me', {
-      headers: { 'Authorization': `Bearer ${token}` },
-      signal: controller.signal
+    const ctrl = new AbortController();
+    tid = setTimeout(() => ctrl.abort(), DISCORD_AUTH_TIMEOUT_MS);
+    const res = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: `Bearer ${token}` },
+      signal: ctrl.signal
     });
-    clearTimeout(timeoutId);
-    if (!userRes.ok) throw new Error('Discord API error');
-    const user = await userRes.json();
-    const expiresIn = Number(params.get('expires_in') || 3600);
-
-    const userData = {
-      id: user.id,
-      username: user.username,
-      global_name: user.global_name || user.username,
-      avatar: user.avatar
-        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png?size=64`
-        : getDefaultDiscordAvatar(user.id),
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('API error');
+    const u = await res.json();
+    const exp = Number(p.get('expires_in') || 3600);
+    const data = {
+      id: u.id,
+      username: u.username,
+      global_name: u.global_name || u.username,
+      avatar: u.avatar
+        ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+        : getDefaultAvatar(u.id),
       token,
-      expires_at: Date.now() + Math.max(expiresIn, 300) * 1000
+      expires_at: Date.now() + Math.max(exp, 300) * 1000
     };
-    localStorage.setItem('statics_moreria_discord_user', JSON.stringify(userData));
-    setCurrentUser(userData);
-    showToast('✅ Signed in as ' + userData.global_name, 'success');
+    localStorage.setItem('statics_moreria_discord_user', JSON.stringify(data));
+    setCurrentUser(data);
+    showToast('Signed in as ' + data.global_name, 'success');
   } catch (e) {
-    if (timeoutId) clearTimeout(timeoutId);
-    clearStoredDiscordUser();
-    setAuthState('error', e.name === 'AbortError' ? 'DISCORD REQUEST TIMED OUT' : 'COULD NOT VERIFY DISCORD');
-    setAuthButtonLoading(false);
+    if (tid) clearTimeout(tid);
+    clearStoredUser();
+    setAuthState('error', e.name === 'AbortError' ? 'TIMED OUT' : 'VERIFY FAILED');
+    setAuthLoading(false);
     showLoginGate();
-    showToast('❌ Discord sign-in failed. Try again.', 'error');
-  } finally {
-    authRequestActive = false;
-  }
+    showToast('Sign-in failed', 'error');
+  } finally { authRequestActive = false; }
 }
-
-function getDefaultDiscordAvatar(id) {
+function getDefaultAvatar(id) {
   try {
-    const avatarIndex = Number((BigInt(id) >> 22n) % 6n);
-    return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`;
-  } catch {
-    return 'https://cdn.discordapp.com/embed/avatars/0.png';
-  }
+    const i = Number((BigInt(id) >> 22n) % 6n);
+    return `https://cdn.discordapp.com/embed/avatars/${i}.png`;
+  } catch { return 'https://cdn.discordapp.com/embed/avatars/0.png'; }
 }
-
 function showLoginGate() {
-  if (currentUser) return;
-  document.getElementById('loginModal').classList.remove('hidden');
+  if (!currentUser) document.getElementById('loginModal').classList.remove('hidden');
 }
-
-function loadStoredUser() {
-  const stored = localStorage.getItem('statics_moreria_discord_user');
-  if (stored) {
-    try {
-      const user = JSON.parse(stored);
-      if (!user.token || (user.expires_at && Date.now() >= user.expires_at)) {
-        clearStoredDiscordUser();
-        return;
-      }
-      setCurrentUser(user);
-    } catch {
-      clearStoredDiscordUser();
-    }
-  }
+function loadStored() {
+  const s = localStorage.getItem('statics_moreria_discord_user');
+  if (!s) return;
+  try {
+    const u = JSON.parse(s);
+    if (!u.token || (u.expires_at && Date.now() >= u.expires_at)) { clearStoredUser(); return; }
+    setCurrentUser(u);
+  } catch { clearStoredUser(); }
 }
-
-function setCurrentUser(user) {
-  currentUser = user;
+function setCurrentUser(u) {
+  currentUser = u;
   document.getElementById('loginModal').classList.add('hidden');
-  setAuthState('success', 'CONNECTED AS ' + (user.global_name || user.username).toUpperCase());
-  setAuthButtonLoading(false);
-  const chip = document.getElementById('userChip');
-  chip.classList.add('show');
+  setAuthState('success', 'CONNECTED');
+  setAuthLoading(false);
+  document.getElementById('userChip').classList.add('show');
   document.getElementById('loginBtn').style.display = 'none';
-  document.getElementById('userAvatar').src = user.avatar;
-  document.getElementById('userNameDisplay').textContent = user.global_name || user.username;
-
-  const adminEntry = ADMIN_MAP[user.username];
-  const adminBtn = document.getElementById('adminOpenBtn');
-  if (adminEntry) adminBtn.classList.add('show');
-
-  applyUserRoleBadge(user.username);
+  document.getElementById('userAvatar').src = u.avatar;
+  document.getElementById('userNameDisplay').textContent = u.global_name || u.username;
+  if (ADMIN_MAP[u.username]) document.getElementById('adminOpenBtn').classList.add('show');
+  applyRoleBadge(u.username);
 }
-
-function applyUserRoleBadge(username) {
-  const topBadge = document.getElementById('topRoleBadge');
+function applyRoleBadge(username) {
+  const el = document.getElementById('topRoleBadge');
   if (ADMIN_MAP[username]) {
     const a = ADMIN_MAP[username];
-    topBadge.textContent = a.title;
-    topBadge.style.background = a.color + '33';
-    topBadge.style.color = a.color;
-    topBadge.style.border = `1px solid ${a.color}66`;
-    topBadge.style.display = 'inline';
+    el.textContent = a.title;
+    el.style.background = 'rgba(255,255,255,0.1)';
+    el.style.color = a.color;
+    el.style.border = '1px solid ' + a.color + '44';
+    el.style.display = 'inline';
     return;
   }
-  const userRoles = getUserRoles();
-  const roleId = userRoles[username];
-  if (roleId) {
+  const ur = getUserRoles();
+  const rid = ur[username];
+  if (rid) {
     const roles = getRoles();
-    const role = roles.find(r => r.id === roleId);
-    if (role) {
-      topBadge.textContent = role.name;
-      topBadge.style.background = role.color + '33';
-      topBadge.style.color = role.color;
-      topBadge.style.border = `1px solid ${role.color}66`;
-      topBadge.style.display = 'inline';
+    const r = roles.find(x => x.id === rid);
+    if (r) {
+      el.textContent = r.name;
+      el.style.background = r.color + '22';
+      el.style.color = r.color;
+      el.style.border = '1px solid ' + r.color + '44';
+      el.style.display = 'inline';
       return;
     }
   }
-  topBadge.style.display = 'none';
+  el.style.display = 'none';
 }
-
 function logout() {
   localStorage.removeItem('statics_moreria_discord_user');
-  sessionStorage.removeItem('statics_moreria_auth_pending');
+  sessionStorage.removeItem('statics_moreria_pending');
   authRequestActive = false;
   currentUser = null;
   document.getElementById('userChip').classList.remove('show');
   document.getElementById('loginBtn').style.display = 'flex';
-  setAuthButtonLoading(false);
-  setAuthState('idle', 'READY TO CONNECT');
+  setAuthLoading(false);
+  setAuthState('idle', 'READY');
   document.getElementById('adminOpenBtn').classList.remove('show');
   showLoginGate();
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ADMIN PANEL
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── ADMIN DATA ──
 function getRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_roles') || '[]'); } catch { return []; } }
 function saveRoles(r) { localStorage.setItem('statics_moreria_roles', JSON.stringify(r)); }
 function getUserRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_user_roles') || '{}'); } catch { return {}; } }
@@ -912,133 +904,100 @@ function saveUserRoles(r) { localStorage.setItem('statics_moreria_user_roles', J
 function getKnownUsers() { try { return JSON.parse(localStorage.getItem('statics_moreria_known_users') || '[]'); } catch { return []; } }
 function saveKnownUsers(u) { localStorage.setItem('statics_moreria_known_users', JSON.stringify(u)); }
 
-function trackKnownUser(user) {
+function trackUser(u) {
   const users = getKnownUsers();
-  const idx = users.findIndex(u => u.id === user.id);
-  const entry = { id: user.id, username: user.username, global_name: user.global_name, avatar: user.avatar };
-  if (idx >= 0) users[idx] = entry; else users.push(entry);
+  const i = users.findIndex(x => x.id === u.id);
+  const e = { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar };
+  if (i >= 0) users[i] = e; else users.push(e);
   saveKnownUsers(users);
 }
 
 function openAdmin() {
-  if (!currentUser || !ADMIN_MAP[currentUser.username]) {
-    showToast('❌ Access denied.', 'error');
-    return;
-  }
-  renderRoles();
-  renderUsers();
+  if (!currentUser || !ADMIN_MAP[currentUser.username]) { showToast('Access denied', 'error'); return; }
+  renderRoles(); renderUsers();
   document.getElementById('adminModal').classList.remove('hidden');
 }
-
 function switchAdminTab(tab, btn) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.admin-tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('adminTab-' + tab).classList.add('active');
+  document.getElementById('pane-' + tab).classList.add('active');
 }
-
 function addRole() {
   const name = document.getElementById('newRoleName').value.trim();
   const color = document.getElementById('newRoleColor').value;
-  if (!name) { showToast('Enter a role name.', 'error'); return; }
+  if (!name) { showToast('Enter a name', 'error'); return; }
   const roles = getRoles();
-  if (roles.some(r => r.name.toLowerCase() === name.toLowerCase())) {
-    showToast('Role already exists.', 'error'); return;
-  }
+  if (roles.some(r => r.name.toLowerCase() === name.toLowerCase())) { showToast('Exists', 'error'); return; }
   roles.push({ id: Date.now().toString(), name, color });
   saveRoles(roles);
   document.getElementById('newRoleName').value = '';
-  renderRoles();
-  renderUsers();
-  showToast('✅ Role "' + name + '" created.', 'success');
+  renderRoles(); renderUsers();
+  showToast('Role added', 'success');
 }
-
 function deleteRole(id) {
-  let roles = getRoles().filter(r => r.id !== id);
-  saveRoles(roles);
+  saveRoles(getRoles().filter(r => r.id !== id));
   const ur = getUserRoles();
-  for (const u in ur) { if (ur[u] === id) delete ur[u]; }
+  for (const k in ur) { if (ur[k] === id) delete ur[k]; }
   saveUserRoles(ur);
-  renderRoles();
-  renderUsers();
+  renderRoles(); renderUsers();
 }
-
 function renderRoles() {
   const list = document.getElementById('rolesList');
   const roles = getRoles();
   if (!roles.length) {
-    list.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--muted);text-align:center;padding:2rem;font-style:italic;">No roles yet. Create one above.</p>';
+    list.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--muted);text-align:center;padding:1.5rem;font-style:italic;">No roles yet</p>';
     return;
   }
-  list.innerHTML = '';
-  roles.forEach(role => {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;';
-    row.innerHTML = `
-      <span style="width:12px;height:12px;border-radius:50%;flex-shrink:0;background:${role.color}"></span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;flex:1;color:var(--text);">${escHtml(role.name)}</span>
-      <span class="user-role-badge" style="background:${role.color}33;color:${role.color};border:1px solid ${role.color}66">${escHtml(role.name)}</span>
-      <button onclick="deleteRole('${role.id}')" style="padding:0.2rem 0.5rem;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.3);border-radius:5px;color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:0.6rem;text-transform:uppercase;cursor:pointer;">Delete</button>
-    `;
-    list.appendChild(row);
-  });
+  list.innerHTML = roles.map(r => `
+    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:0.4rem;">
+      <span style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0;"></span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;flex:1;color:var(--text);">${esc(r.name)}</span>
+      <button onclick="deleteRole('${r.id}')" style="padding:0.15rem 0.4rem;background:transparent;border:1px solid var(--border-strong);border-radius:3px;color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">Del</button>
+    </div>
+  `).join('');
 }
-
 function renderUsers() {
-  const container = document.getElementById('usersList');
+  const c = document.getElementById('usersList');
   const users = getKnownUsers();
   const roles = getRoles();
-  const userRoles = getUserRoles();
-
+  const ur = getUserRoles();
   if (!users.length) {
-    container.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--muted);text-align:center;padding:2rem;font-style:italic;">No users have signed in yet.</p>';
+    c.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--muted);text-align:center;padding:1.5rem;font-style:italic;">No users yet</p>';
     return;
   }
-
-  container.innerHTML = '';
-  users.forEach(user => {
-    const row = document.createElement('div');
-    row.style.cssText = 'display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;';
-
-    let selectHtml = `<select id="rolesel-${user.id}" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.7rem;outline:none;cursor:pointer;">
-      <option value="">— No role —</option>`;
-    roles.forEach(r => {
-      const sel = userRoles[user.username] === r.id ? 'selected' : '';
-      selectHtml += `<option value="${r.id}" ${sel}>${escHtml(r.name)}</option>`;
-    });
-    selectHtml += '</select>';
-
-    const adminEntry = ADMIN_MAP[user.username];
-    const adminBadge = adminEntry
-      ? `<span class="user-role-badge" style="background:${adminEntry.color}33;color:${adminEntry.color};border:1px solid ${adminEntry.color}66">${adminEntry.title}</span>`
-      : '';
-
-    row.innerHTML = `
-      <img style="width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--panel);border:1px solid var(--border);flex-shrink:0;" src="${user.avatar}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;12&quot; fill=&quot;%231a2530&quot;/></svg>'">
-      <span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--text);flex:1;">${escHtml(user.global_name || user.username)}<br><span style="font-size:0.62rem;color:var(--muted)">@${escHtml(user.username)}</span></span>
-      ${adminBadge}
-      ${!adminEntry ? selectHtml : '<span style="font-family:DM Sans,sans-serif;font-size:0.65rem;color:var(--muted)">Built-in admin</span>'}
-      ${!adminEntry ? `<button onclick="assignRole('${user.username}', '${user.id}')" style="padding:0.3rem 0.6rem;background:rgba(141,255,209,0.06);border:1px solid rgba(141,255,209,0.35);border-radius:5px;color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:0.62rem;text-transform:uppercase;cursor:pointer;white-space:nowrap;">Assign</button>` : ''}
+  c.innerHTML = users.map(u => {
+    const isAdmin = ADMIN_MAP[u.username];
+    const select = isAdmin ? '' : `
+      <select id="sel-${u.id}" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.6rem;outline:none;cursor:pointer;">
+        <option value="">—</option>
+        ${roles.map(r => `<option value="${r.id}" ${ur[u.username] === r.id ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}
+      </select>
+      <button onclick="assignRole('${u.username}','${u.id}')" style="padding:0.2rem 0.45rem;background:transparent;border:1px solid var(--border-strong);border-radius:3px;color:var(--muted-light);font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">Set</button>
     `;
-    container.appendChild(row);
-  });
+    return `
+      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:0.4rem;">
+        <img src="${u.avatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'12\\' fill=\\'%23181818\\'/></svg>'">
+        <div style="flex:1;min-width:0;">
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.global_name || u.username)}</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);">@${esc(u.username)}</div>
+        </div>
+        ${isAdmin ? `<span class="role-badge" style="background:rgba(255,255,255,0.08);color:#fff;">${isAdmin.title}</span>` : select}
+      </div>
+    `;
+  }).join('');
 }
-
-function assignRole(username, userId) {
-  const sel = document.getElementById('rolesel-' + userId);
-  const roleId = sel ? sel.value : '';
+function assignRole(username, uid) {
+  const sel = document.getElementById('sel-' + uid);
+  if (!sel) return;
   const ur = getUserRoles();
-  if (roleId) ur[username] = roleId; else delete ur[username];
+  if (sel.value) ur[username] = sel.value; else delete ur[username];
   saveUserRoles(ur);
-  showToast('✅ Role updated for @' + username, 'success');
-  if (currentUser && currentUser.username === username) {
-    applyUserRoleBadge(username);
-  }
+  showToast('Role updated', 'success');
+  if (currentUser && currentUser.username === username) applyRoleBadge(username);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  MODALS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── MODALS ──
 function closeModal(id) {
   if (id === 'loginModal' && !currentUser) return;
   document.getElementById(id).classList.add('hidden');
@@ -1050,21 +1009,17 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   });
 });
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  TOAST
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let toastTimer = null;
+// ── TOAST ──
+let toastTimer;
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = 'toast show' + (type ? ' ' + type : '');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.className = 'toast', 3200);
+  toastTimer = setTimeout(() => t.className = 'toast', 3000);
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  ANIMAL DATA
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── ANIMAL DATA ──
 const ANIMALS = [
 { name: "Strawberry Elephant", rarity: "OG", mps: "750M/s" },
 { name: "Meowl", rarity: "OG", mps: "600M/s" },
@@ -1244,9 +1199,7 @@ const ANIMALS = [
 { name: "Tobi Tobi Tobi", rarity: "Mythic", mps: "8.5K/s" },
 ];
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  MORERIA TOOL LOGIC
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── LIST LOGIC ──
 function addCustomBrainrot() {
   const v = document.getElementById('customBrainrotName').value.trim();
   if (!v) return;
@@ -1255,21 +1208,89 @@ function addCustomBrainrot() {
   document.getElementById('customBrainrotName').value = '';
 }
 function parsePastedList() {
-  const text = document.getElementById('pasteCustomListTextarea').value.trim();
-  if (!text) return;
-  const regex = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
+  const t = document.getElementById('pasteCustomListTextarea').value.trim();
+  if (!t) return;
+  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
   let m;
-  while ((m = regex.exec(text)) !== null) { const n = m[1].trim(); if (n) selected.add(n); }
+  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selected.add(n); }
   renderList(document.getElementById('searchBox').value);
   document.getElementById('pasteCustomListTextarea').value = '';
 }
+function renderList(filter) {
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('animalList');
+  list.innerHTML = '';
+  ANIMALS.forEach(a => {
+    if (q && !a.name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selected.has(a.name) ? ' on' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = selected.has(a.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(a.name); });
+    const nm = document.createElement('span');
+    nm.className = 'a-name';
+    nm.textContent = a.name;
+    const bd = document.createElement('span');
+    bd.className = 'badge';
+    bd.textContent = a.rarity;
+    const mp = document.createElement('span');
+    mp.className = 'a-mps';
+    mp.textContent = a.mps;
+    row.append(cb, nm, bd, mp);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(a.name); });
+    list.appendChild(row);
+  });
+  selected.forEach(n => {
+    if (ANIMALS.some(a => a.name === n)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item on';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(n); });
+    const nm = document.createElement('span');
+    nm.className = 'a-name';
+    nm.textContent = n;
+    const bd = document.createElement('span');
+    bd.className = 'badge';
+    bd.textContent = 'Custom';
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(n); });
+    list.appendChild(row);
+  });
+  document.getElementById('selNum').textContent = selected.size;
+}
+function toggle(n) {
+  selected.has(n) ? selected.delete(n) : selected.add(n);
+  renderList(document.getElementById('searchBox').value);
+}
+function filterList() { renderList(document.getElementById('searchBox').value); }
+function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
+function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
+function validateUsername() {
+  const v = document.getElementById('usernameInput').value.trim();
+  const h = document.getElementById('usernameHint');
+  if (v.length < 3) { h.classList.add('error'); h.textContent = 'Min 3 characters'; return false; }
+  h.classList.remove('error'); h.textContent = 'Minimum 3 characters.'; return true;
+}
+function validateWebhook() {
+  const v = document.getElementById('webhookInput').value.trim();
+  const h = document.getElementById('webhookHint');
+  if (!v.startsWith('https://discord.com/api/webhooks/')) {
+    h.classList.add('error'); h.textContent = 'Must start with https://discord.com/api/webhooks/'; return false;
+  }
+  h.classList.remove('error'); h.textContent = '✅ Valid webhook'; return true;
+}
+
+// ── GENERATE ──
 async function uploadToPastefy(script) {
   try {
     const res = await fetch('https://pastefy.app/api/v2/paste', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'Statics Hub Moreria Script', content: script })
+      body: JSON.stringify({ title: 'Statics Moreria Script', content: script })
     });
     const d = await res.json();
     return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
@@ -1278,28 +1299,27 @@ async function uploadToPastefy(script) {
 
 async function generate() {
   if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
-  const btn = document.querySelector('.btn-gen');
+  const btn = document.getElementById('genBtn');
   const out = document.getElementById('outputBlock');
   if (btn.disabled) return;
   btn.disabled = true;
-  btn.textContent = '⏳ Generating...';
-  btn.style.opacity = '0.6';
+  btn.textContent = 'Generating...';
   try {
     const username = document.getElementById('usernameInput').value.trim();
     const webhook = document.getElementById('webhookInput').value.trim();
-    if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
-    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
+    if (selected.size === 0) throw new Error('Select at least one animal.');
+    if (username.length < 3) throw new Error('Username must be 3+ characters.');
     if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
 
-    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+    const lines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
 
     const script = `-- Statics Hub Moreria Logger
--- Generated at ${new Date().toISOString()}
+-- Generated: ${new Date().toISOString()}
 
 getgenv().WEBHOOK_URL = "${webhook}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
-${brainrotLines}
+${lines}
 }
 
 local C = string.char
@@ -1322,145 +1342,82 @@ return assert(loadstring(game:HttpGet(T(U), true)))()`;
 
     const url = await uploadToPastefy(script);
     out.className = 'code-block';
-    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Failed to upload to Pastefy.\n\n${script}`;
-    incrementScriptCount();
-    showToast('⚡ Script generated!', 'success');
+    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Pastefy upload failed\n\n${script}`;
+    incrementCount();
+    showToast('Script generated!', 'success');
   } catch (err) {
     out.className = 'code-block empty';
-    out.textContent = err.message || 'An error occurred.';
+    out.textContent = err.message || 'Error';
   } finally {
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; btn.style.opacity = '1'; }, 1500);
+    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; }, 1200);
   }
 }
 
-// Roblox user search
-async function searchRobloxUsers(query) {
-  if (query.length < 3) return [];
+// ── ROBLOX SEARCH ──
+async function searchRoblox(q) {
+  if (q.length < 3) return [];
   try {
-    const res = await fetch(`https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(query)}`);
-    if (!res.ok) return [];
-    return (await res.json()).data || [];
+    const res = await fetch(`https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(q)}`);
+    return res.ok ? ((await res.json()).data || []) : [];
   } catch { return []; }
 }
-async function fetchAvatarUrl(userId) {
+async function fetchAvatar(id) {
   try {
-    const res = await fetch(`https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${userId}`);
-    if (!res.ok) return null;
-    return (await res.json()).imageUrl || null;
+    const res = await fetch(`https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${id}`);
+    return res.ok ? ((await res.json()).imageUrl || null) : null;
   } catch { return null; }
 }
 
 async function showSuggestions(users) {
-  const container = document.getElementById('usernameSuggestions');
-  container.innerHTML = '';
-  if (!users.length) { container.style.display = 'none'; return; }
-  const withAvatars = await Promise.all(users.slice(0,5).map(async u => ({ ...u, avatarUrl: await fetchAvatarUrl(u.id) })));
-  withAvatars.forEach(user => {
-    const item = document.createElement('div');
-    item.style.cssText = 'padding:10px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.02);transition:background 0.12s;';
-    item.innerHTML = `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:#1a2530;"><img src="${user.avatarUrl || ''}" style="width:100%;height:100%;object-fit:cover;"></div><div style="flex:1;"><p style="font-size:0.85rem;font-weight:600;color:#fff;">${escHtml(user.displayName || user.name)}</p><p style="font-size:0.75rem;color:var(--neon);">@${escHtml(user.name)}</p></div><span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);">${user.id}</span>`;
-    item.onmouseover = () => item.style.background = 'rgba(141,255,209,0.06)';
-    item.onmouseout = () => item.style.background = 'transparent';
-    item.onclick = () => { document.getElementById('usernameInput').value = user.name; container.style.display = 'none'; validateUsername(); };
-    container.appendChild(item);
+  const c = document.getElementById('usernameSuggestions');
+  c.innerHTML = '';
+  if (!users.length) { c.style.display = 'none'; return; }
+  const enriched = await Promise.all(users.slice(0,5).map(async u => ({ ...u, av: await fetchAvatar(u.id) })));
+  enriched.forEach(u => {
+    const d = document.createElement('div');
+    d.className = 'sug-item';
+    d.innerHTML = `<div class="sug-avatar"><img src="${u.av || ''}" alt=""></div><div><div class="sug-name">${esc(u.displayName || u.name)}</div><div class="sug-handle">@${esc(u.name)}</div></div>`;
+    d.onclick = () => {
+      document.getElementById('usernameInput').value = u.name;
+      c.style.display = 'none';
+      validateUsername();
+    };
+    c.appendChild(d);
   });
-  container.style.cssText = 'position:absolute;bottom:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;display:block;';
+  c.className = 'suggestions';
+  c.style.display = 'block';
 }
 
 const debounce = (fn, d) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), d); }; };
 
-document.getElementById('usernameInput').addEventListener('input', debounce(async function(e) {
+document.getElementById('usernameInput').addEventListener('input', debounce(async e => {
   const q = e.target.value.trim();
   if (!q) { document.getElementById('usernameSuggestions').style.display = 'none'; return; }
-  showSuggestions(await searchRobloxUsers(q));
+  showSuggestions(await searchRoblox(q));
 }, 300));
 
-function renderList(filter) {
-  const q = (filter || '').toLowerCase();
-  const list = document.getElementById('animalList');
-  list.innerHTML = '';
-  ANIMALS.forEach(animal => {
-    if (q && !animal.name.toLowerCase().includes(q)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item' + (selected.has(animal.name) ? ' on' : '');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = selected.has(animal.name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(animal.name); });
-    const lbl = document.createElement('span');
-    lbl.className = 'a-name';
-    lbl.textContent = animal.name;
-    const badge = document.createElement('span');
-    badge.className = 'badge-og';
-    badge.textContent = animal.rarity;
-    const mps = document.createElement('span');
-    mps.style.cssText = 'font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--muted);text-align:right;min-width:90px;';
-    mps.textContent = animal.mps;
-    row.append(cb, lbl, badge, mps);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
-    list.appendChild(row);
-  });
-  selected.forEach(name => {
-    if (ANIMALS.some(a => a.name === name)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item on';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = true;
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(name); });
-    const lbl = document.createElement('span');
-    lbl.className = 'a-name';
-    lbl.textContent = name;
-    const badge = document.createElement('span');
-    badge.className = 'badge-og';
-    badge.textContent = 'Custom';
-    row.append(cb, lbl, badge);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(name); });
-    list.appendChild(row);
-  });
-  document.getElementById('selNum').textContent = selected.size;
-}
-function toggle(name) { selected.has(name) ? selected.delete(name) : selected.add(name); renderList(document.getElementById('searchBox').value); }
-function filterList() { renderList(document.getElementById('searchBox').value); }
-function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
-function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
-
-function validateUsername() {
-  const v = document.getElementById('usernameInput').value.trim();
-  const h = document.getElementById('usernameHint');
-  if (v.length < 3) { h.classList.add('error'); h.textContent = 'Username must be at least 3 characters long!'; return false; }
-  h.classList.remove('error'); h.textContent = 'The Roblox username to target in the script (3 characters minimum).'; return true;
-}
-function validateWebhook() {
-  const v = document.getElementById('webhookInput').value.trim();
-  const h = document.getElementById('webhookHint');
-  if (!v.startsWith('https://discord.com/api/webhooks/')) { h.classList.add('error'); h.textContent = 'Webhook must start with: https://discord.com/api/webhooks/'; return false; }
-  h.classList.remove('error'); h.textContent = '✅ Valid Discord webhook.'; return true;
-}
+// ── COPY ──
 function copyOut() {
   const code = document.getElementById('outputBlock').textContent;
   if (!code || code.startsWith('--')) return;
   navigator.clipboard.writeText(code).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied!'; btn.classList.add('ok');
-    setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✓';
+    b.classList.add('ok');
+    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('ok'); }, 1500);
   });
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  UTILS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+// ── UTILS ──
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  INIT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ── INIT ──
 window.addEventListener('DOMContentLoaded', async () => {
   initCounter();
-  await handleDiscordCallback();
-  loadStoredUser();
+  await handleCallback();
+  loadStored();
   if (!currentUser) showLoginGate();
   renderList();
 });
