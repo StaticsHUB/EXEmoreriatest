@@ -633,6 +633,105 @@
   .toast.success { border-color: var(--green); }
   .toast.error { border-color: var(--danger); }
 
+  /* ── FAKE LOG FEED ── */
+  .live-badge {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 99px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--danger);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-left: auto;
+  }
+  .live-badge::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--danger);
+    animation: livePulse 1.4s infinite;
+  }
+  @keyframes livePulse {
+    0% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+    70% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { opacity: 1; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+  }
+
+  .feed-row {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
+  }
+  .feed-row:hover { background: rgba(255,255,255,0.02); }
+  .feed-row:last-child { border-bottom: none; }
+  .feed-avatar {
+    width: 36px; height: 36px; border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface);
+    flex-shrink: 0;
+  }
+  .feed-avatar.user {
+    border-radius: 50%;
+    border: 1px solid var(--border);
+  }
+  .feed-info { flex: 1; min-width: 0; }
+  .feed-name {
+    font-size: 0.9rem; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .feed-name .roblox-tag {
+    font-size: 0.65rem; font-weight: 600;
+    padding: 1px 5px; border-radius: 3px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: var(--green);
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .feed-handle { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+  .feed-brainrots {
+    display: flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .feed-brainrot-chip {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    padding: 0.15rem 0.5rem 0.15rem 0.15rem;
+    border-radius: 99px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    font-size: 0.68rem; color: var(--muted-light);
+    font-weight: 500;
+  }
+  .feed-brainrot-chip img {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--bg);
+  }
+  .feed-brainrot-more {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    padding: 0.15rem 0.5rem;
+  }
+  .feed-score {
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .feed-score-num {
+    font-size: 1rem; font-weight: 700;
+    font-family: 'Space Grotesk', sans-serif;
+    color: var(--accent);
+  }
+  .feed-score-lbl {
+    font-size: 0.62rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+
   /* ── UTILITY ── */
   .mt-2 { margin-top: 0.8rem; }
   .gap-row { display: flex; gap: 0.5rem; }
@@ -788,11 +887,14 @@
 <!-- ── TAB: LOGS ── -->
 <div class="container" id="tab-logs">
   <div class="lb-header">
-    <h1>Activity Logs</h1>
-    <p>Recent script generations across the platform.</p>
+    <h1>Live Hits</h1>
+    <p>Real-time brainrot hits recorded across the platform.</p>
   </div>
   <div class="lb-list">
-    <div class="lb-list-head">Recent Generations</div>
+    <div class="lb-list-head">
+      Live Feed
+      <span class="live-badge">Live</span>
+    </div>
     <div id="logsContainer"></div>
   </div>
 </div>
@@ -928,6 +1030,7 @@ let selected = new Set();
 let selectedBases = new Set();
 let currentUser = null;
 let authRequestActive = false;
+let fakeFeedTimer = null;
 
 // ── TABS ──
 function switchTab(tabId, btnEl) {
@@ -938,7 +1041,12 @@ function switchTab(tabId, btnEl) {
   if (btnEl) btnEl.classList.add('active');
 
   if (tabId === 'leaderboard') renderLeaderboard();
-  if (tabId === 'logs') renderLogs();
+  if (tabId === 'logs') {
+    renderLogs();
+    startFakeFeed();
+  } else {
+    stopFakeFeed();
+  }
   if (tabId === 'profile') renderProfile();
   if (tabId === 'credits') renderCredits();
 }
@@ -1036,6 +1144,158 @@ function trackGeneration(username, globalName, avatar, brainrots, bases) {
   });
   if (data.history.length > 50) data.history.pop();
   saveGlobalLogs(data);
+}
+
+// ── FAKE LIVE FEED ──
+const FAKE_USERNAMES = [
+  'xX_SniperXx', 'Builderman', 'NoobMaster69', 'xShadowBladez', 'ToxicVenom',
+  'bloxfruitsgawd', 'RobloxGamerPro', 'xX_DarkLord_Xx', 'ItsMeMario', 'Slayer_2077',
+  'GigaChad_99', 'xx_phantom_xx', 'RobuxFarmer123', 'Notch_Lover', 'CreeperAwMan',
+  'AlphaWolf_77', 'xXMythicXx', 'PixelKnight', 'RocketRaccoon', 'SniperKing420',
+  'MysticMage_101', 'HyperNovaX', 'ShadowReaper99', 'CyberNinjaX', 'TitanSlayer',
+  'FrostByte_76', 'VortexStorm', 'Quantum_Bot', 'DragonSlayerX', 'PhoenixRises',
+  'IceDragonz', 'BlazeFury', 'StormBreaker', 'KnightOfNight', 'SkullCrusher',
+  'PixelPirate', 'SkyLord_22', 'VoidWalker', 'NeonBlade', 'LunarEclipse',
+  'SolarFlareX', 'CosmicDust', 'StarlightKid', 'ThunderBoltZ', 'LightningFast',
+  'AquaBlaze', 'FireStorm_99', 'EarthShaker', 'WindRider', 'SnowLeopard',
+  'TigerClaw', 'EagleEyeX', 'BearCub_77', 'FoxNinja', 'WolfPack',
+  'HawkEye_99', 'LionHeartX', 'SharkBait_22', 'CobraKai_77', 'FalconPunch'
+];
+
+function randomFakeUsername() {
+  const base = FAKE_USERNAMES[Math.floor(Math.random() * FAKE_USERNAMES.length)];
+  if (Math.random() < 0.3) {
+    return base + Math.floor(Math.random() * 999);
+  }
+  return base;
+}
+
+function wikiImageUrl(name) {
+  const slug = name.trim().replace(/ /g, '_');
+  return `https://stealabrainrot.fandom.com/wiki/Special:FilePath/${encodeURIComponent(slug)}.png`;
+}
+
+function randomBrainrotImage(name) {
+  // Fallback chain: try .png, then .webp
+  return {
+    primary: wikiImageUrl(name),
+    fallback: `https://stealabrainrot.fandom.com/wiki/Special:FilePath/${encodeURIComponent(name.replace(/ /g, '_'))}.webp`
+  };
+}
+
+function pickRandomBrainrots(count) {
+  const pool = [...ANIMALS];
+  const picks = [];
+  for (let i = 0; i < count && pool.length; i++) {
+    const idx = Math.floor(Math.random() * pool.length);
+    picks.push(pool.splice(idx, 1)[0]);
+  }
+  return picks;
+}
+
+function buildFakeFeedEntry() {
+  const numBrainrots = Math.floor(Math.random() * 20) + 1;
+  const brainrots = pickRandomBrainrots(numBrainrots);
+  return {
+    username: randomFakeUsername(),
+    time: Date.now(),
+    brainrots
+  };
+}
+
+function fakeFeedEntryHTML(entry, isNew = false) {
+  const robloxAvatar = `https://www.roblox.com/headshot-thumbnail/image?userId=${Math.floor(Math.random() * 90000000) + 10000000}&width=48&height=48&format=png`;
+  const MAX_CHIPS = 3;
+  const visible = entry.brainrots.slice(0, MAX_CHIPS);
+  const remaining = entry.brainrots.length - visible.length;
+
+  const chipsHTML = visible.map(br => {
+    const img = wikiImageUrl(br.name);
+    return `<span class="feed-brainrot-chip">
+      <img src="${img}" alt="${esc(br.name)}" onerror="this.src='https://stealabrainrot.fandom.com/wiki/Special:FilePath/Brainrot_Placeholder.png';this.onerror=null;">
+      ${esc(br.name)}
+    </span>`;
+  }).join('');
+
+  const moreHTML = remaining > 0
+    ? `<span class="feed-brainrot-more">+${remaining} more</span>`
+    : '';
+
+  const timeAgo = Math.max(0, Math.floor((Date.now() - entry.time) / 1000));
+  const timeStr = timeAgo < 5 ? 'just now' : timeAgo < 60 ? `${timeAgo}s ago` : `${Math.floor(timeAgo / 60)}m ago`;
+
+  return `
+    <div class="feed-row" ${isNew ? 'style="animation:smoothEnter 0.4s ease;"' : ''}>
+      <img class="feed-avatar user" src="${robloxAvatar}" alt="${esc(entry.username)}" onerror="this.style.background='var(--surface)';this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><circle cx=%2212%22 cy=%228%22 r=%224%22/><path d=%22M4 20c0-4 4-6 8-6s8 2 8 6v2H4z%22/></svg>';this.onerror=null;">
+      <div class="feed-info">
+        <div class="feed-name">
+          ${esc(entry.username)}
+          <span class="roblox-tag">ROBLOX</span>
+        </div>
+        <div class="feed-handle">hit ${entry.brainrots.length} brainrot${entry.brainrots.length === 1 ? '' : 's'} · ${timeStr}</div>
+        <div class="feed-brainrots">
+          ${chipsHTML}
+          ${moreHTML}
+        </div>
+      </div>
+      <div class="feed-score">
+        <div class="feed-score-num">${entry.brainrots.length}</div>
+        <div class="feed-score-lbl">hit${entry.brainrots.length === 1 ? '' : 's'}</div>
+      </div>
+    </div>
+  `;
+}
+
+function getFakeFeedState() {
+  try {
+    return JSON.parse(localStorage.getItem('statics_fake_feed') || '[]');
+  } catch { return []; }
+}
+function saveFakeFeedState(feed) {
+  localStorage.setItem('statics_fake_feed', JSON.stringify(feed.slice(0, 50)));
+}
+
+function renderLogs() {
+  const container = document.getElementById('logsContainer');
+  const feed = getFakeFeedState();
+  if (feed.length === 0) {
+    // seed with a few entries so it's never empty
+    for (let i = 0; i < 5; i++) {
+      const entry = buildFakeFeedEntry();
+      entry.time = Date.now() - (i * 30 + 10) * 1000;
+      feed.push(entry);
+    }
+    saveFakeFeedState(feed);
+  }
+  container.innerHTML = feed.map(e => fakeFeedEntryHTML(e)).join('');
+}
+
+function pushFakeFeedEntry() {
+  const container = document.getElementById('logsContainer');
+  if (!container) return;
+  const entry = buildFakeFeedEntry();
+  const feed = getFakeFeedState();
+  feed.unshift(entry);
+  saveFakeFeedState(feed);
+  const html = fakeFeedEntryHTML(entry, true);
+  container.insertAdjacentHTML('afterbegin', html);
+  // Cap visible entries
+  while (container.children.length > 50) {
+    container.removeChild(container.lastChild);
+  }
+}
+
+function startFakeFeed() {
+  stopFakeFeed();
+  pushFakeFeedEntry();
+  fakeFeedTimer = setInterval(pushFakeFeedEntry, 30000);
+}
+
+function stopFakeFeed() {
+  if (fakeFeedTimer) {
+    clearInterval(fakeFeedTimer);
+    fakeFeedTimer = null;
+  }
 }
 
 // ── DISCORD AUTH ──
@@ -1388,29 +1648,6 @@ function renderLeaderboard() {
   }
 }
 
-// ── LOGS RENDERING ──
-function renderLogs() {
-  const data = getGlobalLogs();
-  const container = document.getElementById('logsContainer');
-  if (data.history.length === 0) {
-    container.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.9rem;">No logs recorded yet.</div>';
-    return;
-  }
-  
-  container.innerHTML = data.history.map(h => {
-    const timeAgo = Math.floor((Date.now() - h.time) / 60000);
-    return `
-      <div class="lb-row">
-        <img class="lb-avatar" src="${h.avatar}" alt="">
-        <div class="lb-info">
-          <div class="lb-name">${esc(h.global_name)} <span style="font-weight:400;color:var(--muted);font-size:0.75rem;">generated a script</span></div>
-          <div class="lb-handle">${esc(h.details)} • ${timeAgo}m ago</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
 // ── PROFILE RENDERING ──
 function renderProfile() {
   const logoutBtn = document.getElementById('profileLogoutBtn');
@@ -1744,13 +1981,20 @@ const BASES = [
   { name: "Tralalero",  rarity: "Event" },
 ];
 
-window.addEventListener('DOMContentLoaded', async () => {
+// ── BOOT ──
+async function boot() {
   await handleCallback();
   loadStored();
   if (!currentUser) showLoginGate();
   renderList();
   renderBaseList();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', boot);
+} else {
+  boot();
+}
 </script>
 </body>
 </html>
