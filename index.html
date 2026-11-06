@@ -691,6 +691,15 @@
     color: var(--green);
     font-family: 'Share Tech Mono', monospace;
   }
+  .feed-name .op-tag {
+    font-size: 0.65rem; font-weight: 700;
+    padding: 1px 5px; border-radius: 3px;
+    background: rgba(249, 115, 22, 0.15);
+    border: 1px solid rgba(249, 115, 22, 0.4);
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.05em;
+  }
   .feed-handle { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
   .feed-brainrots {
     display: flex; align-items: center; gap: 0.4rem;
@@ -711,6 +720,11 @@
     border-radius: 50%;
     object-fit: cover;
     background: var(--bg);
+  }
+  .feed-brainrot-chip .img-placeholder {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--border);
   }
   .feed-brainrot-more {
     font-family: 'Share Tech Mono', monospace;
@@ -1001,7 +1015,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// ── INTRO ANIMATION (fixed: fires early, hard fallback, pointer-events off) ──
+// ── INTRO ANIMATION ──
 function dismissIntro() {
   const overlay = document.getElementById('introOverlay');
   if (overlay && !overlay.classList.contains('hidden')) {
@@ -1147,72 +1161,144 @@ function trackGeneration(username, globalName, avatar, brainrots, bases) {
 }
 
 // ── FAKE LIVE FEED ──
-const FAKE_USERNAMES = [
-  'xX_SniperXx', 'Builderman', 'NoobMaster69', 'xShadowBladez', 'ToxicVenom',
-  'bloxfruitsgawd', 'RobloxGamerPro', 'xX_DarkLord_Xx', 'ItsMeMario', 'Slayer_2077',
-  'GigaChad_99', 'xx_phantom_xx', 'RobuxFarmer123', 'Notch_Lover', 'CreeperAwMan',
-  'AlphaWolf_77', 'xXMythicXx', 'PixelKnight', 'RocketRaccoon', 'SniperKing420',
-  'MysticMage_101', 'HyperNovaX', 'ShadowReaper99', 'CyberNinjaX', 'TitanSlayer',
-  'FrostByte_76', 'VortexStorm', 'Quantum_Bot', 'DragonSlayerX', 'PhoenixRises',
-  'IceDragonz', 'BlazeFury', 'StormBreaker', 'KnightOfNight', 'SkullCrusher',
-  'PixelPirate', 'SkyLord_22', 'VoidWalker', 'NeonBlade', 'LunarEclipse',
-  'SolarFlareX', 'CosmicDust', 'StarlightKid', 'ThunderBoltZ', 'LightningFast',
-  'AquaBlaze', 'FireStorm_99', 'EarthShaker', 'WindRider', 'SnowLeopard',
-  'TigerClaw', 'EagleEyeX', 'BearCub_77', 'FoxNinja', 'WolfPack',
-  'HawkEye_99', 'LionHeartX', 'SharkBait_22', 'CobraKai_77', 'FalconPunch'
+// Realistic Roblox-style name generator: stem + optional suffix + optional digits
+const ROBLOX_STEMS = [
+  'Shadow', 'Blade', 'Ghost', 'Frost', 'Blaze', 'Night', 'Storm', 'Titan',
+  'Pixel', 'Neon', 'Cyber', 'Void', 'Ash', 'Ember', 'Nova', 'Rogue', 'Prime',
+  'Crimson', 'Azure', 'Onyx', 'Lunar', 'Solar', 'Echo', 'Vortex', 'Quasar',
+  'Nebula', 'Havoc', 'Bolt', 'Savage', 'Rapid', 'Silent', 'Faded', 'Cursed',
+  'Phantom', 'Specter', 'Griffin', 'Falcon', 'Wolf', 'Raven', 'Kraken',
+  'Dagger', 'Talon', 'Thorn', 'Saber', 'Vector', 'Pulse', 'Drift', 'Shift'
 ];
+const ROBLOX_SUFFIXES = [
+  '', '', '', 'z', 'X', 'xx', 'YT', 'Pro', 'Gaming', 'Playz', 'Plays',
+  'FN', 'TTV', 'RB', 'Xx', 'Boii', 'Boi', 'King', 'God', 'Lord'
+];
+const ROBLOX_PREFIX_TAGS = ['', '', '', 'xX', 'Its', 'Real', 'The', 'Mr', 'IAm'];
 
 function randomFakeUsername() {
-  const base = FAKE_USERNAMES[Math.floor(Math.random() * FAKE_USERNAMES.length)];
-  if (Math.random() < 0.3) {
-    return base + Math.floor(Math.random() * 999);
+  const r = Math.random();
+  // 15% chance: single lowercase word handle (very common on Roblox)
+  if (r < 0.15) {
+    const word = ROBLOX_STEMS[Math.floor(Math.random() * ROBLOX_STEMS.length)].toLowerCase();
+    return word + Math.floor(Math.random() * 90 + 10);
   }
-  return base;
+  // 10% chance: pure word handle no digits
+  if (r < 0.25) {
+    return ROBLOX_STEMS[Math.floor(Math.random() * ROBLOX_STEMS.length)] +
+           ROBLOX_SUFFIXES[Math.floor(Math.random() * ROBLOX_SUFFIXES.length)];
+  }
+  // Otherwise: prefix + stem + suffix + (sometimes) digits
+  const prefix = ROBLOX_PREFIX_TAGS[Math.floor(Math.random() * ROBLOX_PREFIX_TAGS.length)];
+  const stem = ROBLOX_STEMS[Math.floor(Math.random() * ROBLOX_STEMS.length)];
+  const suffix = ROBLOX_SUFFIXES[Math.floor(Math.random() * ROBLOX_SUFFIXES.length)];
+  let base = prefix + stem + suffix;
+  if (Math.random() < 0.55) {
+    base += Math.floor(Math.random() * 9999);
+  }
+  return base.slice(0, 20);
 }
 
-function wikiImageUrl(name) {
-  const slug = name.trim().replace(/ /g, '_');
-  return `https://stealabrainrot.fandom.com/wiki/Special:FilePath/${encodeURIComponent(slug)}.png`;
+// ── BRAINROT IMAGE RESOLUTION (MediaWiki API) ──
+const _imgCache = new Map();
+const _imgPending = new Map();
+
+function resolveBrainrotImage(name) {
+  if (_imgCache.has(name)) return Promise.resolve(_imgCache.get(name));
+  if (_imgPending.has(name)) return _imgPending.get(name);
+  const p = (async () => {
+    try {
+      const url = `https://stealabrainrot.fandom.com/api.php?action=query&prop=pageimages&format=json&piprop=thumbnail&pithumbsize=500&origin=*&titles=${encodeURIComponent(name)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      const pages = json.query?.pages || {};
+      const page = Object.values(pages)[0];
+      const thumb = page?.thumbnail?.source || null;
+      _imgCache.set(name, thumb);
+      _imgPending.delete(name);
+      return thumb;
+    } catch {
+      _imgCache.set(name, null);
+      _imgPending.delete(name);
+      return null;
+    }
+  })();
+  _imgPending.set(name, p);
+  return p;
 }
 
-function randomBrainrotImage(name) {
-  // Fallback chain: try .png, then .webp
-  return {
-    primary: wikiImageUrl(name),
-    fallback: `https://stealabrainrot.fandom.com/wiki/Special:FilePath/${encodeURIComponent(name.replace(/ /g, '_'))}.webp`
-  };
+// ── BRAINROT RARITY POOLS ──
+function parseMps(str) {
+  if (!str) return 0;
+  const m = String(str).match(/([\d.]+)\s*([MKB]?)/i);
+  if (!m) return 0;
+  const n = parseFloat(m[1]);
+  const unit = (m[2] || '').toUpperCase();
+  if (unit === 'M') return n * 1e6;
+  if (unit === 'K') return n * 1e3;
+  if (unit === 'B') return n * 1e9;
+  return n;
 }
 
-function pickRandomBrainrots(count) {
-  const pool = [...ANIMALS];
+const OP_THRESHOLD = 200e6;        // 200M/s
+const OP_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+const OP_LAST_KEY = 'statics_last_op_roll';
+
+const NORMAL_POOL = ANIMALS.filter(a => parseMps(a.mps) < OP_THRESHOLD);
+const OP_POOL     = ANIMALS.filter(a => parseMps(a.mps) >= OP_THRESHOLD);
+
+function pickRandom(list, count) {
+  const pool = [...list];
   const picks = [];
   for (let i = 0; i < count && pool.length; i++) {
-    const idx = Math.floor(Math.random() * pool.length);
-    picks.push(pool.splice(idx, 1)[0]);
+    picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
   }
   return picks;
 }
 
+function canRollOP() {
+  const last = Number(localStorage.getItem(OP_LAST_KEY) || 0);
+  return (Date.now() - last) >= OP_COOLDOWN_MS;
+}
+
 function buildFakeFeedEntry() {
-  const numBrainrots = Math.floor(Math.random() * 20) + 1;
-  const brainrots = pickRandomBrainrots(numBrainrots);
+  let brainrots;
+  let isOP = false;
+  if (canRollOP() && Math.random() < 0.3) {
+    // OP roll: 1 OP brainrot + up to 3 fillers from normal pool
+    isOP = true;
+    localStorage.setItem(OP_LAST_KEY, String(Date.now()));
+    const op = pickRandom(OP_POOL, 1);
+    const fillers = pickRandom(NORMAL_POOL, Math.floor(Math.random() * 4));
+    brainrots = [...op, ...fillers];
+  } else {
+    const count = Math.floor(Math.random() * 20) + 1;
+    brainrots = pickRandom(NORMAL_POOL, count);
+  }
   return {
     username: randomFakeUsername(),
     time: Date.now(),
-    brainrots
+    brainrots,
+    isOP
   };
 }
 
-function fakeFeedEntryHTML(entry, isNew = false) {
+async function fakeFeedEntryHTML(entry, isNew = false) {
+  // Prefetch every brainrot image in this entry before rendering
+  const images = await Promise.all(entry.brainrots.map(b => resolveBrainrotImage(b.name)));
+
   const robloxAvatar = `https://www.roblox.com/headshot-thumbnail/image?userId=${Math.floor(Math.random() * 90000000) + 10000000}&width=48&height=48&format=png`;
   const MAX_CHIPS = 3;
   const visible = entry.brainrots.slice(0, MAX_CHIPS);
   const remaining = entry.brainrots.length - visible.length;
 
-  const chipsHTML = visible.map(br => {
-    const img = wikiImageUrl(br.name);
+  const chipsHTML = visible.map((br, i) => {
+    const imgSrc = images[i];
+    const inner = imgSrc
+      ? `<img src="${imgSrc}" alt="${esc(br.name)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'img-placeholder'}))">`
+      : `<div class="img-placeholder"></div>`;
     return `<span class="feed-brainrot-chip">
-      <img src="${img}" alt="${esc(br.name)}" onerror="this.src='https://stealabrainrot.fandom.com/wiki/Special:FilePath/Brainrot_Placeholder.png';this.onerror=null;">
+      ${inner}
       ${esc(br.name)}
     </span>`;
   }).join('');
@@ -1224,6 +1310,8 @@ function fakeFeedEntryHTML(entry, isNew = false) {
   const timeAgo = Math.max(0, Math.floor((Date.now() - entry.time) / 1000));
   const timeStr = timeAgo < 5 ? 'just now' : timeAgo < 60 ? `${timeAgo}s ago` : `${Math.floor(timeAgo / 60)}m ago`;
 
+  const opTag = entry.isOP ? `<span class="op-tag">OP</span>` : '';
+
   return `
     <div class="feed-row" ${isNew ? 'style="animation:smoothEnter 0.4s ease;"' : ''}>
       <img class="feed-avatar user" src="${robloxAvatar}" alt="${esc(entry.username)}" onerror="this.style.background='var(--surface)';this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22%2352525b%22><circle cx=%2212%22 cy=%228%22 r=%224%22/><path d=%22M4 20c0-4 4-6 8-6s8 2 8 6v2H4z%22/></svg>';this.onerror=null;">
@@ -1231,6 +1319,7 @@ function fakeFeedEntryHTML(entry, isNew = false) {
         <div class="feed-name">
           ${esc(entry.username)}
           <span class="roblox-tag">ROBLOX</span>
+          ${opTag}
         </div>
         <div class="feed-handle">hit ${entry.brainrots.length} brainrot${entry.brainrots.length === 1 ? '' : 's'} · ${timeStr}</div>
         <div class="feed-brainrots">
@@ -1255,11 +1344,10 @@ function saveFakeFeedState(feed) {
   localStorage.setItem('statics_fake_feed', JSON.stringify(feed.slice(0, 50)));
 }
 
-function renderLogs() {
+async function renderLogs() {
   const container = document.getElementById('logsContainer');
-  const feed = getFakeFeedState();
+  let feed = getFakeFeedState();
   if (feed.length === 0) {
-    // seed with a few entries so it's never empty
     for (let i = 0; i < 5; i++) {
       const entry = buildFakeFeedEntry();
       entry.time = Date.now() - (i * 30 + 10) * 1000;
@@ -1267,19 +1355,19 @@ function renderLogs() {
     }
     saveFakeFeedState(feed);
   }
-  container.innerHTML = feed.map(e => fakeFeedEntryHTML(e)).join('');
+  const htmlParts = await Promise.all(feed.map(e => fakeFeedEntryHTML(e)));
+  container.innerHTML = htmlParts.join('');
 }
 
-function pushFakeFeedEntry() {
+async function pushFakeFeedEntry() {
   const container = document.getElementById('logsContainer');
   if (!container) return;
   const entry = buildFakeFeedEntry();
   const feed = getFakeFeedState();
   feed.unshift(entry);
   saveFakeFeedState(feed);
-  const html = fakeFeedEntryHTML(entry, true);
+  const html = await fakeFeedEntryHTML(entry, true);
   container.insertAdjacentHTML('afterbegin', html);
-  // Cap visible entries
   while (container.children.length > 50) {
     container.removeChild(container.lastChild);
   }
